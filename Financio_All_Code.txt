@@ -1,0 +1,3676 @@
+FILE: ./FinancioUITests/FinancioUITests.swift
+//
+//  FinancioUITests.swift
+//  FinancioUITests
+//
+//  Created by Ariane Boulet on 10/04/2026.
+//
+
+import XCTest
+
+final class FinancioUITests: XCTestCase {
+
+    override func setUpWithError() throws {
+        // Put setup code here. This method is called before the invocation of each test method in the class.
+
+        // In UI tests it is usually best to stop immediately when a failure occurs.
+        continueAfterFailure = false
+
+        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
+    }
+
+    override func tearDownWithError() throws {
+        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    }
+
+    @MainActor
+    func testExample() throws {
+        // UI tests must launch the application that they test.
+        let app = XCUIApplication()
+        app.launch()
+
+        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    }
+
+    @MainActor
+    func testLaunchPerformance() throws {
+        // This measures how long it takes to launch your application.
+        measure(metrics: [XCTApplicationLaunchMetric()]) {
+            XCUIApplication().launch()
+        }
+    }
+}
+
+---END OF FILE---
+
+FILE: ./FinancioUITests/FinancioUITestsLaunchTests.swift
+//
+//  FinancioUITestsLaunchTests.swift
+//  FinancioUITests
+//
+//  Created by Ariane Boulet on 10/04/2026.
+//
+
+import XCTest
+
+final class FinancioUITestsLaunchTests: XCTestCase {
+
+    override class var runsForEachTargetApplicationUIConfiguration: Bool {
+        true
+    }
+
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+    }
+
+    @MainActor
+    func testLaunch() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        // Insert steps here to perform after app launch but before taking a screenshot,
+        // such as logging into a test account or navigating somewhere in the app
+
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = "Launch Screen"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+}
+
+---END OF FILE---
+
+FILE: ./ViewModels/BudgetViewModel.swift
+//
+//  BudgetViewModel.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+
+---END OF FILE---
+
+FILE: ./ViewModels/TransactionsViewModel.swift
+//
+//  TransactionsViewModel.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+
+---END OF FILE---
+
+FILE: ./ViewModels/DashboardViewModel.swift
+//
+//  DashboardViewModel.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+
+---END OF FILE---
+
+FILE: ./ViewModels/AccountsViewModel.swift
+//
+//  AccountsViewModel.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+
+---END OF FILE---
+
+FILE: ./App/FinancioApp.swift
+//
+//  FinancioApp.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 10/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+
+@main
+struct FinancioApp: App {
+    
+    // Tracks whether onboarding has already been completed.
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    
+    var body: some Scene {
+        WindowGroup {
+            if hasCompletedOnboarding {
+                MainTabView()
+            } else {
+                OnboardingView()
+            }
+        }
+        .modelContainer(for: [
+            Account.self,
+            Category.self,
+            BudgetTransaction.self,
+            Budget.self,
+            RecurringTransaction.self
+        ])
+    }
+}
+
+---END OF FILE---
+
+FILE: ./Models/BudgetTransaction.swift
+//
+//  Transaction.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+import Foundation
+import SwiftData
+
+// This enum defines the three kinds of transactions
+// our budgeting app supports.
+enum TransactionType: String, Codable, CaseIterable {
+    case income = "Income"
+    case expense = "Expense"
+    case transfer = "Transfer"
+}
+
+// The @Model macro tells SwiftData to store Transaction objects persistently.
+@Model
+final class BudgetTransaction {
+    
+    // A unique identifier for each transaction.
+    var id: UUID
+    
+    // A short title that describes the transaction.
+    // Example: "Weekly groceries", "Paycheck", "Move to savings"
+    var title: String
+    
+    // The amount of money involved in the transaction.
+    // We store this as a positive value and interpret it using the transaction type.
+    var amount: Double
+    
+    // The date when the transaction happened.
+    var date: Date
+    
+    // The kind of transaction: income, expense, or transfer.
+    var type: TransactionType
+    
+    // An optional note for extra details.
+    // Example: "Bought food for the week"
+    var note: String
+    
+    // The main account related to the transaction.
+    // For an expense: money leaves this account.
+    // For an income: money enters this account.
+    // For a transfer: money leaves this account.
+    var account: Account?
+    
+    // The destination account for transfers.
+    // This is only needed when type == .transfer.
+    var toAccount: Account?
+    
+    // The category for the transaction.
+    // This is useful for income and expense transactions.
+    // For transfers, category may be nil.
+    var category: Category?
+    
+    // Initializer used to create a new transaction.
+    init(
+        id: UUID = UUID(),
+        title: String,
+        amount: Double,
+        date: Date = Date(),
+        type: TransactionType,
+        note: String = "",
+        account: Account? = nil,
+        toAccount: Account? = nil,
+        category: Category? = nil
+    ) {
+        self.id = id
+        self.title = title
+        self.amount = amount
+        self.date = date
+        self.type = type
+        self.note = note
+        self.account = account
+        self.toAccount = toAccount
+        self.category = category
+    }
+}
+
+---END OF FILE---
+
+FILE: ./Models/RecurringTransaction.swift
+//
+//  RecurringTransaction.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 13/04/2026.
+//
+
+import Foundation
+import SwiftData
+
+// Defines how often a recurring transaction repeats.
+enum RecurringFrequency: String, Codable, CaseIterable {
+    case weekly = "Weekly"
+    case monthly = "Monthly"
+    case yearly = "Yearly"
+}
+
+// The @Model macro tells SwiftData to persist recurring transaction rules.
+@Model
+final class RecurringTransaction {
+    
+    // A unique identifier for each recurring transaction rule.
+    var id: UUID
+    
+    // The visible title of the recurring rule.
+    // Example: "Monthly Rent", "Salary", "Netflix"
+    var title: String
+    
+    // The amount associated with the recurring transaction.
+    var amount: Double
+    
+    // The type of transaction this recurring rule generates.
+    var type: TransactionType
+    
+    // How often the rule repeats.
+    var frequency: RecurringFrequency
+    
+    // The next date on which this recurring transaction should be applied.
+    var nextDate: Date
+    
+    // Optional note for extra context.
+    var note: String
+    
+    // The main account used by the recurring transaction.
+    var account: Account?
+    
+    // The destination account, only used for transfers.
+    var toAccount: Account?
+    
+    // The category, used for income and expense transactions.
+    var category: Category?
+    
+    // Indicates whether the recurring rule is currently active.
+    // This lets the user pause it without deleting it.
+    var isActive: Bool
+    
+    // Initializer used to create a recurring transaction rule.
+    init(
+        id: UUID = UUID(),
+        title: String,
+        amount: Double,
+        type: TransactionType,
+        frequency: RecurringFrequency,
+        nextDate: Date,
+        note: String = "",
+        account: Account? = nil,
+        toAccount: Account? = nil,
+        category: Category? = nil,
+        isActive: Bool = true
+    ) {
+        self.id = id
+        self.title = title
+        self.amount = amount
+        self.type = type
+        self.frequency = frequency
+        self.nextDate = nextDate
+        self.note = note
+        self.account = account
+        self.toAccount = toAccount
+        self.category = category
+        self.isActive = isActive
+    }
+}
+
+---END OF FILE---
+
+FILE: ./Models/Category.swift
+//
+//  Category.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+import Foundation
+import SwiftData
+
+// This enum defines whether a category is used for income or expenses.
+// This helps us keep financial data organized correctly.
+enum CategoryKind: String, Codable, CaseIterable {
+    case income = "Income"
+    case expense = "Expense"
+}
+
+// The @Model macro tells SwiftData that Category objects
+// should be stored in the local persistent database.
+@Model
+final class Category {
+    
+    // A unique identifier for each category.
+    // We use UUID so each category can be uniquely recognized.
+    var id: UUID
+    
+    // The visible name of the category.
+    // Example: "Groceries", "Rent", "Salary"
+    var name: String
+    
+    // Indicates whether the category belongs to income or expense transactions.
+    var kind: CategoryKind
+    
+    // Stores the name of an SF Symbol icon.
+    // Example: "cart", "house", "dollarsign.circle"
+    var iconName: String
+    
+    // Stores a color as a hex string.
+    // Example: "#34C759" for green, "#FF3B30" for red
+    // We store text here because Color itself is not ideal as stored model data.
+    var colorHex: String
+    
+    // Indicates whether this category is a built-in system category
+    // or one created by the user.
+    var isSystem: Bool
+    
+    // Initializer used to create a new category.
+    init(
+        id: UUID = UUID(),
+        name: String,
+        kind: CategoryKind,
+        iconName: String = "tag",
+        colorHex: String = "#007AFF",
+        isSystem: Bool = false
+    ) {
+        self.id = id
+        self.name = name
+        self.kind = kind
+        self.iconName = iconName
+        self.colorHex = colorHex
+        self.isSystem = isSystem
+    }
+}
+
+---END OF FILE---
+
+FILE: ./Models/Budget.swift
+//
+//  Budget.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+import Foundation
+import SwiftData
+
+// The @Model macro tells SwiftData that Budget objects
+// should be stored persistently in the local database.
+@Model
+final class Budget {
+    
+    // A unique identifier for each budget record.
+    var id: UUID
+    
+    // The month this budget applies to.
+    // Example: 1 for January, 12 for December
+    var month: Int
+    
+    // The year this budget applies to.
+    // Example: 2026
+    var year: Int
+    
+    // The amount the user plans to spend for this category
+    // during the specified month and year.
+    var plannedAmount: Double
+    
+    // The category this budget belongs to.
+    // Example: Groceries, Rent, Entertainment
+    var category: Category?
+    
+    // Initializer used to create a new budget.
+    init(
+        id: UUID = UUID(),
+        month: Int,
+        year: Int,
+        plannedAmount: Double,
+        category: Category? = nil
+    ) {
+        self.id = id
+        self.month = month
+        self.year = year
+        self.plannedAmount = plannedAmount
+        self.category = category
+    }
+}
+
+---END OF FILE---
+
+FILE: ./Models/Account.swift
+//
+//  Account.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+import Foundation
+import SwiftData
+
+// This enum defines the allowed types of accounts in the app.
+// Using an enum is safer than using plain text strings,
+// because Swift can restrict the possible values.
+enum AccountType: String, Codable, CaseIterable {
+    case checking = "Checking"
+    case savings = "Savings"
+    case cash = "Cash"
+    case creditCard = "Credit Card"
+}
+
+// The @Model macro tells SwiftData that this class should be stored persistently.
+// In other words, objects of this class can be saved to the app's local database.
+@Model
+final class Account {
+    
+    // A unique identifier for each account.
+    // We use UUID so every account is guaranteed to be distinguishable.
+    var id: UUID
+    
+    // The name the user gives to the account.
+    // Example: "Main Checking", "Emergency Savings"
+    var name: String
+    
+    // The kind of account this is.
+    // We use the enum above so the user must choose from valid account types.
+    var type: AccountType
+    
+    // The current balance of the account.
+    // We use Double because money values can include decimals.
+    // Example: 1250.75
+    var balance: Double
+    
+    // The date when the account was created in the app.
+    // This can be useful later for sorting or analytics.
+    var createdAt: Date
+    
+    // Instead of deleting an account permanently,
+    // we can mark it as archived and hide it from normal views.
+    var isArchived: Bool
+    
+    // This initializer defines how to create a new Account object.
+    // We provide default values for some properties to make object creation easier.
+    init(
+        id: UUID = UUID(),
+        name: String,
+        type: AccountType,
+        balance: Double = 0.0,
+        createdAt: Date = Date(),
+        isArchived: Bool = false
+    ) {
+        self.id = id
+        self.name = name
+        self.type = type
+        self.balance = balance
+        self.createdAt = createdAt
+        self.isArchived = isArchived
+    }
+}
+
+---END OF FILE---
+
+FILE: ./Extensions/Color+App.swift
+//
+//  Color+App.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+
+---END OF FILE---
+
+FILE: ./FinancioTests/FinancioTests.swift
+//
+//  FinancioTests.swift
+//  FinancioTests
+//
+//  Created by Ariane Boulet on 10/04/2026.
+//
+
+import Testing
+@testable import Financio
+
+struct FinancioTests {
+
+    @Test func example() async throws {
+        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+    }
+
+}
+
+---END OF FILE---
+
+FILE: ./Views/Settings/SettingsView.swift
+//
+//  SettingsView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+
+struct SettingsView: View {
+    
+    @Environment(\.modelContext) private var modelContext
+    
+    @Query private var accounts: [Account]
+    @Query private var categories: [Category]
+    @Query private var transactions: [BudgetTransaction]
+    @Query private var budgets: [Budget]
+    
+    @AppStorage("selectedCurrencyCode") private var selectedCurrencyCode = "USD"
+    
+    // Controls the reset alert.
+    @State private var isShowingResetAlert = false
+    
+    var body: some View {
+        NavigationStack {
+            List {
+                
+                Section("General") {
+                    Picker("Currency", selection: $selectedCurrencyCode) {
+                        ForEach(CurrencyManager.supportedCurrencies) { currency in
+                            Text("\(currency.name) (\(currency.code))")
+                                .tag(currency.code)
+                        }
+                    }
+                }
+                
+                Section("Customization") {
+                    NavigationLink {
+                        CategoriesListView()
+                    } label: {
+                        Label("Manage Categories", systemImage: "tag")
+                    }
+                    
+                    NavigationLink {
+                        RecurringTransactionsListView()
+                    } label: {
+                        Label("Manage Recurring Transactions", systemImage: "arrow.triangle.2.circlepath")
+                    }
+                }
+                
+                Section("Data Management") {
+                    Button(role: .destructive) {
+                        isShowingResetAlert = true
+                    } label: {
+                        Label("Reset All Data", systemImage: "trash")
+                    }
+                }
+            }
+            .navigationTitle("Settings")
+            .onAppear {
+                DefaultCategorySeeder.seedCategoriesIfNeeded(
+                    in: modelContext,
+                    existingCategories: categories
+                )
+            }
+            .alert("Reset All Data?", isPresented: $isShowingResetAlert) {
+                
+                // Cancel button is clearly visible in an alert.
+                Button("Cancel", role: .cancel) { }
+                
+                // Destructive confirmation button.
+                Button("Delete All Data", role: .destructive) {
+                    resetAllData()
+                }
+                
+            } message: {
+                Text("This will permanently delete all accounts, categories, transactions, and budgets. This action cannot be undone.")
+            }
+        }
+    }
+    
+    // Deletes all stored financial data from SwiftData.
+    private func resetAllData() {
+        // Delete transactions first because they reference accounts and categories.
+        for transaction in transactions {
+            modelContext.delete(transaction)
+        }
+        
+        // Delete budgets next because they reference categories.
+        for budget in budgets {
+            modelContext.delete(budget)
+        }
+        
+        // Delete categories.
+        for category in categories {
+            modelContext.delete(category)
+        }
+        
+        // Delete accounts last.
+        for account in accounts {
+            modelContext.delete(account)
+        }
+    }
+}
+
+#Preview {
+    SettingsView()
+}
+
+---END OF FILE---
+
+FILE: ./Views/Dashboard/DashboardView.swift
+//
+//  DashboardView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+import Charts
+
+struct DashboardView: View {
+    
+    @Query private var accounts: [Account]
+    
+    @Query(sort: \BudgetTransaction.date, order: .reverse)
+    private var transactions: [BudgetTransaction]
+    
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 16) {
+                    
+                    // Summary cards section
+                    VStack(spacing: 12) {
+                        SummaryCardView(
+                            title: "Total Balance",
+                            amount: totalBalance,
+                            color: .blue
+                        )
+                        
+                        SummaryCardView(
+                            title: "Income This Month",
+                            amount: incomeThisMonth,
+                            color: .green
+                        )
+                        
+                        SummaryCardView(
+                            title: "Expenses This Month",
+                            amount: expensesThisMonth,
+                            color: .red
+                        )
+                        
+                        SummaryCardView(
+                            title: "Net Cash Flow",
+                            amount: netCashFlowThisMonth,
+                            color: netCashFlowColor
+                        )
+                    }
+                    .padding(.horizontal)
+                    
+                    // Navigation to Reports
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Insights")
+                            .font(.title2)
+                            .bold()
+                        
+                        NavigationLink {
+                            ReportsView()
+                        } label: {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("View Full Reports")
+                                        .font(.headline)
+                                    
+                                    Text("See monthly income, expenses, and cash flow trends.")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                
+                                Spacer()
+                                
+                                Image(systemName: "chevron.right")
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding()
+                            .background(Color(.systemGray6))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.horizontal)
+                    
+                    // Spending by category chart
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Spending by Category")
+                            .font(.title2)
+                            .bold()
+                        
+                        if spendingByCategoryData.isEmpty {
+                            ContentUnavailableView(
+                                "No Expense Data Yet",
+                                systemImage: "chart.bar.xaxis",
+                                description: Text("Your monthly spending chart will appear here once you add expense transactions.")
+                            )
+                        } else {
+                            Chart(spendingByCategoryData, id: \.categoryName) { item in
+                                BarMark(
+                                    x: .value("Category", item.categoryName),
+                                    y: .value("Amount", item.amount)
+                                )
+                                .foregroundStyle(.red.gradient)
+                            }
+                            .frame(height: 220)
+                        }
+                    }
+                    .padding(.horizontal)
+                    
+                    // Top spending category section
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Top Spending Category")
+                            .font(.title2)
+                            .bold()
+                        
+                        if let topCategory = topSpendingCategory {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(topCategory.name)
+                                    .font(.headline)
+                                
+                                MoneyText(amount: topCategory.amount)
+                                    .font(.title3)
+                                    .bold()
+                                    .foregroundStyle(.red)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding()
+                            .background(Color(.systemGray6))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                        } else {
+                            ContentUnavailableView(
+                                "No Spending Data Yet",
+                                systemImage: "chart.bar",
+                                description: Text("Your top spending category will appear here once you add expense transactions.")
+                            )
+                        }
+                    }
+                    .padding(.horizontal)
+                    
+                    // Recent transactions section
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Recent Transactions")
+                            .font(.title2)
+                            .bold()
+                        
+                        if recentTransactions.isEmpty {
+                            ContentUnavailableView(
+                                "No Recent Transactions",
+                                systemImage: "tray",
+                                description: Text("Your recent activity will appear here.")
+                            )
+                        } else {
+                            ForEach(recentTransactions) { transaction in
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(transaction.title)
+                                            .font(.headline)
+                                        
+                                        Text(transaction.type.rawValue)
+                                            .font(.subheadline)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    MoneyText(amount: transaction.amount)
+                                        .bold()
+                                        .foregroundStyle(amountColor(for: transaction.type))
+                                }
+                                .padding()
+                                .background(Color(.systemGray6))
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                .padding(.vertical)
+            }
+            .navigationTitle("Dashboard")
+        }
+    }
+    
+    // Returns only accounts that are not archived.
+    private var activeAccounts: [Account] {
+        accounts.filter { account in
+            account.isArchived == false
+        }
+    }
+    
+    // Computes the total balance across active accounts only.
+    private var totalBalance: Double {
+        activeAccounts.reduce(0) { partialResult, account in
+            partialResult + account.balance
+        }
+    }
+    
+    // Computes total income for the current month.
+    private var incomeThisMonth: Double {
+        transactions
+            .filter { transaction in
+                transaction.type == .income && isInCurrentMonth(transaction.date)
+            }
+            .reduce(0) { partialResult, transaction in
+                partialResult + transaction.amount
+            }
+    }
+    
+    // Computes total expenses for the current month.
+    private var expensesThisMonth: Double {
+        transactions
+            .filter { transaction in
+                transaction.type == .expense && isInCurrentMonth(transaction.date)
+            }
+            .reduce(0) { partialResult, transaction in
+                partialResult + transaction.amount
+            }
+    }
+    
+    // Computes net cash flow for the current month.
+    private var netCashFlowThisMonth: Double {
+        incomeThisMonth - expensesThisMonth
+    }
+    
+    // Chooses a color for the net cash flow card.
+    private var netCashFlowColor: Color {
+        if netCashFlowThisMonth > 0 {
+            return .green
+        } else if netCashFlowThisMonth < 0 {
+            return .red
+        } else {
+            return .blue
+        }
+    }
+    
+    // Returns only the 5 most recent transactions.
+    private var recentTransactions: [BudgetTransaction] {
+        Array(transactions.prefix(5))
+    }
+    
+    // Builds chart data showing expense totals by category for the current month.
+    private var spendingByCategoryData: [(categoryName: String, amount: Double)] {
+        let expenseTransactions = transactions.filter { transaction in
+            transaction.type == .expense &&
+            isInCurrentMonth(transaction.date) &&
+            transaction.category != nil
+        }
+        
+        var totalsByCategory: [String: Double] = [:]
+        
+        for transaction in expenseTransactions {
+            let categoryName = transaction.category?.name ?? "Unknown"
+            totalsByCategory[categoryName, default: 0] += transaction.amount
+        }
+        
+        return totalsByCategory
+            .map { entry in
+                (categoryName: entry.key, amount: entry.value)
+            }
+            .sorted { first, second in
+                first.amount > second.amount
+            }
+    }
+    
+    // Computes the category with the highest spending in the current month.
+    private var topSpendingCategory: (name: String, amount: Double)? {
+        guard let topEntry = spendingByCategoryData.first else {
+            return nil
+        }
+        
+        return (name: topEntry.categoryName, amount: topEntry.amount)
+    }
+    
+    // Checks whether a date belongs to the current month and year.
+    private func isInCurrentMonth(_ date: Date) -> Bool {
+        let calendar = Calendar.current
+        let now = Date()
+        
+        let transactionMonth = calendar.component(.month, from: date)
+        let transactionYear = calendar.component(.year, from: date)
+        
+        let currentMonth = calendar.component(.month, from: now)
+        let currentYear = calendar.component(.year, from: now)
+        
+        return transactionMonth == currentMonth && transactionYear == currentYear
+    }
+    
+    // Returns a color depending on transaction type.
+    private func amountColor(for type: TransactionType) -> Color {
+        switch type {
+        case .income:
+            return .green
+        case .expense:
+            return .red
+        case .transfer:
+            return .blue
+        }
+    }
+}
+
+#Preview {
+    DashboardView()
+}
+
+---END OF FILE---
+
+FILE: ./Views/Dashboard/SummaryCardView.swift
+//
+//  SummaryCardView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+import SwiftUI
+
+struct SummaryCardView: View {
+    
+    let title: String
+    let amount: Double
+    let color: Color
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(.secondary)
+            
+            MoneyText(amount: amount)
+                .font(.title2)
+                .bold()
+                .foregroundStyle(color)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(Color(.systemGray6))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+#Preview {
+    SummaryCardView(
+        title: "Total Balance",
+        amount: 1234.56,
+        color: .blue
+    )
+    .padding()
+}
+
+---END OF FILE---
+
+FILE: ./Views/Components/MoneyText.swift
+//
+//  MoneyText.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 13/04/2026.
+//
+
+import SwiftUI
+
+struct MoneyText: View {
+    
+    // Reads the selected app currency from persistent app settings.
+    @AppStorage("selectedCurrencyCode") private var selectedCurrencyCode = "USD"
+    
+    // The numeric amount to display as money.
+    let amount: Double
+    
+    var body: some View {
+        Text(amount, format: .currency(code: selectedCurrencyCode))
+    }
+}
+
+#Preview {
+    VStack(spacing: 12) {
+        MoneyText(amount: 1234.56)
+        MoneyText(amount: -78.90)
+    }
+    .padding()
+}
+
+---END OF FILE---
+
+FILE: ./Views/Transactions/TransactionsListView.swift
+//
+//  TransactionsListView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+
+struct TransactionsListView: View {
+    
+    @Environment(\.modelContext) private var modelContext
+    
+    @Query(sort: \BudgetTransaction.date, order: .reverse)
+    private var transactions: [BudgetTransaction]
+    
+    @State private var isShowingAddTransaction = false
+    @State private var selectedTransaction: BudgetTransaction?
+    
+    // Stores the transaction the user is about to delete.
+    @State private var transactionPendingDeletion: BudgetTransaction?
+    
+    var body: some View {
+        NavigationStack {
+            Group {
+                if transactions.isEmpty {
+                    ContentUnavailableView(
+                        "No Transactions Yet",
+                        systemImage: "list.bullet.rectangle",
+                        description: Text("Add your first transaction to start tracking your money.")
+                    )
+                } else {
+                    List {
+                        ForEach(transactions) { transaction in
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(transaction.title)
+                                    .font(.headline)
+                                
+                                Text(transaction.type.rawValue)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                
+                                MoneyText(amount: transaction.amount)
+                                    .font(.subheadline)
+                                    .bold()
+                                    .foregroundStyle(amountColor(for: transaction.type))
+                                
+                                Text(transaction.date, format: .dateTime.day().month().year())
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding(.vertical, 4)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                selectedTransaction = transaction
+                            }
+                            .swipeActions {
+                                Button(role: .destructive) {
+                                    // Do not delete immediately.
+                                    // First store the transaction and ask for confirmation.
+                                    transactionPendingDeletion = transaction
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Transactions")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        isShowingAddTransaction = true
+                    } label: {
+                        Label("Add Transaction", systemImage: "plus")
+                    }
+                }
+            }
+            .sheet(isPresented: $isShowingAddTransaction) {
+                AddTransactionView()
+            }
+            .sheet(item: $selectedTransaction) { transaction in
+                EditTransactionView(transaction: transaction)
+            }
+            .confirmationDialog(
+                "Delete this transaction?",
+                isPresented: Binding(
+                    get: { transactionPendingDeletion != nil },
+                    set: { newValue in
+                        if newValue == false {
+                            transactionPendingDeletion = nil
+                        }
+                    }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Delete Transaction", role: .destructive) {
+                    if let transactionPendingDeletion {
+                        deleteTransaction(transactionPendingDeletion)
+                        self.transactionPendingDeletion = nil
+                    }
+                }
+                
+                Button("Cancel", role: .cancel) {
+                    transactionPendingDeletion = nil
+                }
+            } message: {
+                Text("This will remove the transaction and reverse its effect on account balances.")
+            }
+        }
+    }
+    
+    private func amountColor(for type: TransactionType) -> Color {
+        switch type {
+        case .income:
+            return .green
+        case .expense:
+            return .red
+        case .transfer:
+            return .blue
+        }
+    }
+    
+    private func deleteTransaction(_ transaction: BudgetTransaction) {
+        // Reverse the transaction's balance effect before deleting it.
+        TransactionBalanceService.reverse(transaction)
+        
+        // Delete the transaction itself.
+        modelContext.delete(transaction)
+    }
+}
+
+#Preview {
+    TransactionsListView()
+}
+
+---END OF FILE---
+
+FILE: ./Views/Transactions/EditTransactionView.swift
+//
+//  EditTransactionView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+
+struct EditTransactionView: View {
+    
+    @Environment(\.dismiss) private var dismiss
+    
+    // Fetch all accounts and categories from SwiftData.
+    @Query(sort: \Account.name) private var accounts: [Account]
+    @Query(sort: \Category.name) private var categories: [Category]
+    
+    // The existing transaction that we are editing.
+    let transaction: BudgetTransaction
+    
+    // Form state initialized from the existing transaction.
+    @State private var title: String
+    @State private var amount: Double
+    @State private var date: Date
+    @State private var selectedType: TransactionType
+    @State private var note: String
+    @State private var selectedAccount: Account?
+    @State private var selectedToAccount: Account?
+    @State private var selectedCategory: Category?
+    
+    // Custom initializer to pre-fill the form with the transaction's current values.
+    init(transaction: BudgetTransaction) {
+        self.transaction = transaction
+        _title = State(initialValue: transaction.title)
+        _amount = State(initialValue: transaction.amount)
+        _date = State(initialValue: transaction.date)
+        _selectedType = State(initialValue: transaction.type)
+        _note = State(initialValue: transaction.note)
+        _selectedAccount = State(initialValue: transaction.account)
+        _selectedToAccount = State(initialValue: transaction.toAccount)
+        _selectedCategory = State(initialValue: transaction.category)
+    }
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Transaction Details") {
+                    TextField("Title", text: $title)
+                    
+                    Picker("Type", selection: $selectedType) {
+                        ForEach(TransactionType.allCases, id: \.self) { type in
+                            Text(type.rawValue).tag(type)
+                        }
+                    }
+                    
+                    TextField("Amount", value: $amount, format: .number)
+                        .keyboardType(.decimalPad)
+                    
+                    DatePicker("Date", selection: $date, displayedComponents: .date)
+                    
+                    TextField("Note", text: $note)
+                }
+                
+                Section("Accounts") {
+                    Picker("Account", selection: $selectedAccount) {
+                        Text("Select an account").tag(Account?.none)
+                        
+                        ForEach(availableAccountsForSelection) { account in
+                            Text(accountDisplayName(account)).tag(Optional(account))
+                        }
+                    }
+                    
+                    // Only show destination account picker for transfers.
+                    if selectedType == .transfer {
+                        Picker("To Account", selection: $selectedToAccount) {
+                            Text("Select destination").tag(Account?.none)
+                            
+                            ForEach(availableToAccountsForSelection) { account in
+                                Text(accountDisplayName(account)).tag(Optional(account))
+                            }
+                        }
+                    }
+                }
+                
+                // Only show category picker for income and expense.
+                if selectedType != .transfer {
+                    Section("Category") {
+                        Picker("Category", selection: $selectedCategory) {
+                            Text("Select a category").tag(Category?.none)
+                            
+                            ForEach(filteredCategories) { category in
+                                Text(category.name).tag(Optional(category))
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Edit Transaction")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save") {
+                        updateTransaction()
+                    }
+                    .disabled(!isFormValid)
+                }
+            }
+            .onChange(of: selectedType) { _, newType in
+                switch newType {
+                case .income:
+                    // Income does not use a destination account.
+                    selectedToAccount = nil
+                    
+                    // Clear the category if it is not a valid income category.
+                    if selectedCategory?.kind != CategoryKind.income {
+                        selectedCategory = nil
+                    }
+                    
+                case .expense:
+                    // Expense does not use a destination account.
+                    selectedToAccount = nil
+                    
+                    // Clear the category if it is not a valid expense category.
+                    if selectedCategory?.kind != CategoryKind.expense {
+                        selectedCategory = nil
+                    }
+                    
+                case .transfer:
+                    // Transfers do not use categories.
+                    selectedCategory = nil
+                }
+            }
+        }
+    }
+    
+    // Main account picker options:
+    // all active accounts, plus the currently selected one if it is archived.
+    private var availableAccountsForSelection: [Account] {
+        var result = accounts.filter { account in
+            account.isArchived == false
+        }
+        
+        if let selectedAccount,
+           selectedAccount.isArchived,
+           result.contains(where: { account in
+               account.id == selectedAccount.id
+           }) == false {
+            result.append(selectedAccount)
+        }
+        
+        return result.sorted { first, second in
+            first.name < second.name
+        }
+    }
+    
+    // Destination account picker options:
+    // all active accounts, plus the currently selected destination account if it is archived.
+    private var availableToAccountsForSelection: [Account] {
+        var result = accounts.filter { account in
+            account.isArchived == false
+        }
+        
+        if let selectedToAccount,
+           selectedToAccount.isArchived,
+           result.contains(where: { account in
+               account.id == selectedToAccount.id
+           }) == false {
+            result.append(selectedToAccount)
+        }
+        
+        return result.sorted { first, second in
+            first.name < second.name
+        }
+    }
+    
+    // Filters categories so the user only sees categories
+    // matching the chosen transaction type.
+    private var filteredCategories: [Category] {
+        switch selectedType {
+        case .income:
+            return categories.filter { category in
+                category.kind == CategoryKind.income
+            }
+        case .expense:
+            return categories.filter { category in
+                category.kind == CategoryKind.expense
+            }
+        case .transfer:
+            return []
+        }
+    }
+    
+    // Basic validation for the form.
+    private var isFormValid: Bool {
+        let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard !trimmedTitle.isEmpty, amount > 0, selectedAccount != nil else {
+            return false
+        }
+        
+        switch selectedType {
+        case .income:
+            return selectedCategory?.kind == CategoryKind.income
+            
+        case .expense:
+            return selectedCategory?.kind == CategoryKind.expense
+            
+        case .transfer:
+            guard let selectedToAccount else { return false }
+            return selectedToAccount.id != selectedAccount?.id
+        }
+    }
+    
+    // Adds a label for archived accounts when they appear in edit pickers.
+    private func accountDisplayName(_ account: Account) -> String {
+        if account.isArchived {
+            return "\(account.name) (Archived)"
+        } else {
+            return account.name
+        }
+    }
+    
+    // Updates the transaction by reversing the old balance effects,
+    // changing the stored values, then applying the new effects.
+    private func updateTransaction() {
+        guard isFormValid else { return }
+        
+        // Step 1: Reverse the old balance effect.
+        TransactionBalanceService.reverse(transaction)
+        
+        // Step 2: Update the transaction's stored properties.
+        transaction.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        transaction.amount = amount
+        transaction.date = date
+        transaction.type = selectedType
+        transaction.note = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        transaction.account = selectedAccount
+        transaction.toAccount = selectedType == .transfer ? selectedToAccount : nil
+        transaction.category = selectedType == .transfer ? nil : selectedCategory
+        
+        // Step 3: Apply the new balance effect.
+        TransactionBalanceService.apply(transaction)
+        
+        dismiss()
+    }
+}
+
+#Preview {
+    Text("EditTransactionView Preview")
+}
+
+---END OF FILE---
+
+FILE: ./Views/Transactions/AddTransactionView.swift
+//
+//  AddTransactionView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+
+struct AddTransactionView: View {
+    
+    // Gives access to the SwiftData context so we can insert transactions.
+    @Environment(\.modelContext) private var modelContext
+    
+    // Lets us dismiss the sheet after saving or canceling.
+    @Environment(\.dismiss) private var dismiss
+    
+    // Fetch all accounts so the user can select one.
+    @Query(sort: \Account.name) private var accounts: [Account]
+    
+    // Fetch all categories so the user can select one when needed.
+    @Query(sort: \Category.name) private var categories: [Category]
+    
+    // Form state properties
+    @State private var title = ""
+    @State private var amount = 0.0
+    @State private var date = Date()
+    @State private var selectedType: TransactionType = .expense
+    @State private var note = ""
+    
+    // Selected related models
+    @State private var selectedAccount: Account?
+    @State private var selectedToAccount: Account?
+    @State private var selectedCategory: Category?
+    
+    // Filter accounts to select from active accounts only
+    private var activeAccounts: [Account] {
+        accounts.filter { account in
+            account.isArchived == false
+        }
+    }
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                
+                Section("Transaction Details") {
+                    TextField("Title", text: $title)
+                    
+                    Picker("Type", selection: $selectedType) {
+                        ForEach(TransactionType.allCases, id: \.self) { type in
+                            Text(type.rawValue).tag(type)
+                        }
+                    }
+                    
+                    TextField("Amount", value: $amount, format: .number)
+                        .keyboardType(.decimalPad)
+                    
+                    DatePicker("Date", selection: $date, displayedComponents: .date)
+                    
+                    TextField("Note", text: $note)
+                }
+                
+                Section("Accounts") {
+                    Picker("Account", selection: $selectedAccount) {
+                        Text("Select an account").tag(Account?.none)
+                        ForEach(activeAccounts) { account in
+                            Text(account.name).tag(Optional(account))
+                        }
+                    }
+                    
+                    // Only show destination account picker for transfers.
+                    if selectedType == .transfer {
+                        Picker("To Account", selection: $selectedToAccount) {
+                            Text("Select destination").tag(Account?.none)
+                            ForEach(activeAccounts) { account in
+                                Text(account.name).tag(Optional(account))
+                            }
+                        }
+                    }
+                }
+                
+                // Only show category picker for income and expense.
+                if selectedType != .transfer {
+                    Section("Category") {
+                        Picker("Category", selection: $selectedCategory) {
+                            Text("Select a category").tag(Category?.none)
+                            ForEach(filteredCategories) { category in
+                                Text(category.name).tag(Optional(category))
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Add Transaction")
+            .toolbar {
+                
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save") {
+                        saveTransaction()
+                    }
+                    .disabled(!isFormValid)
+                }
+            }
+        }
+    }
+    
+    // Filters categories so the user only sees categories
+    // that match the chosen transaction type.
+    private var filteredCategories: [Category] {
+        switch selectedType {
+        case .income:
+            return categories.filter { category in
+                category.kind == CategoryKind.income
+            }
+        case .expense:
+            return categories.filter { category in
+                category.kind == CategoryKind.expense
+            }
+        case .transfer:
+            return []
+        }
+    }
+    
+    // Basic validation for the form.
+    private var isFormValid: Bool {
+        let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Title must not be empty and amount must be greater than zero.
+        guard !trimmedTitle.isEmpty, amount > 0, selectedAccount != nil else {
+            return false
+        }
+        
+        switch selectedType {
+        case .income, .expense:
+            // Income and expense should have a category.
+            return selectedCategory != nil
+            
+        case .transfer:
+            // Transfers need a destination account that is different from the source account.
+            guard let selectedToAccount else { return false }
+            return selectedToAccount.id != selectedAccount?.id
+        }
+    }
+    
+    // Creates and saves the transaction, then updates account balances.
+    private func saveTransaction() {
+        guard let selectedAccount else { return }
+        
+        let newTransaction = BudgetTransaction(
+            title: title.trimmingCharacters(in: .whitespacesAndNewlines),
+            amount: amount,
+            date: date,
+            type: selectedType,
+            note: note.trimmingCharacters(in: .whitespacesAndNewlines),
+            account: selectedAccount,
+            toAccount: selectedType == .transfer ? selectedToAccount : nil,
+            category: selectedType == .transfer ? nil : selectedCategory
+        )
+        
+        // Apply the balance effect of the new transaction.
+        TransactionBalanceService.apply(newTransaction)
+        
+        // Insert the transaction into SwiftData.
+        modelContext.insert(newTransaction)
+        
+        // Close the sheet.
+        dismiss()
+    }
+}
+
+#Preview {
+    AddTransactionView()
+}
+
+---END OF FILE---
+
+FILE: ./Views/Accounts/AccountsListView.swift
+//
+//  AccountsListView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+
+struct AccountsListView: View {
+    
+    @Environment(\.modelContext) private var modelContext
+    
+    @Query(sort: \Account.name) private var accounts: [Account]
+    
+    @State private var isShowingAddAccount = false
+    @State private var selectedAccount: Account?
+    
+    // Stores the account the user is about to archive.
+    @State private var accountPendingArchive: Account?
+    
+    var body: some View {
+        NavigationStack {
+            Group {
+                if activeAccounts.isEmpty && archivedAccounts.isEmpty {
+                    ContentUnavailableView(
+                        "No Accounts Yet",
+                        systemImage: "creditcard",
+                        description: Text("Add your first account to start tracking your money.")
+                    )
+                } else {
+                    List {
+                        // Active accounts section
+                        if !activeAccounts.isEmpty {
+                            Section("Active Accounts") {
+                                ForEach(activeAccounts) { account in
+                                    accountRow(for: account)
+                                        .swipeActions {
+                                            Button {
+                                                // Ask for confirmation before archiving.
+                                                accountPendingArchive = account
+                                            } label: {
+                                                Label("Archive", systemImage: "archivebox")
+                                            }
+                                            .tint(.orange)
+                                        }
+                                }
+                            }
+                        }
+                        
+                        // Archived accounts section
+                        if !archivedAccounts.isEmpty {
+                            Section("Archived Accounts") {
+                                ForEach(archivedAccounts) { account in
+                                    accountRow(for: account)
+                                        .swipeActions {
+                                            Button {
+                                                unarchiveAccount(account)
+                                            } label: {
+                                                Label("Unarchive", systemImage: "arrow.uturn.backward")
+                                            }
+                                            .tint(.blue)
+                                        }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Accounts")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        isShowingAddAccount = true
+                    } label: {
+                        Label("Add Account", systemImage: "plus")
+                    }
+                }
+            }
+            .sheet(isPresented: $isShowingAddAccount) {
+                AddAccountView()
+            }
+            .sheet(item: $selectedAccount) { account in
+                EditAccountView(account: account)
+            }
+            .confirmationDialog(
+                "Archive this account?",
+                isPresented: Binding(
+                    get: { accountPendingArchive != nil },
+                    set: { newValue in
+                        if newValue == false {
+                            accountPendingArchive = nil
+                        }
+                    }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Archive Account", role: .destructive) {
+                    if let accountPendingArchive {
+                        archiveAccount(accountPendingArchive)
+                        self.accountPendingArchive = nil
+                    }
+                }
+                
+                Button("Cancel", role: .cancel) {
+                    accountPendingArchive = nil
+                }
+            } message: {
+                Text("Archived accounts are hidden from active lists, excluded from total balance, and unavailable for new transactions.")
+            }
+        }
+    }
+    
+    // Accounts that are still active.
+    private var activeAccounts: [Account] {
+        accounts.filter { account in
+            account.isArchived == false
+        }
+    }
+    
+    // Accounts that have been archived.
+    private var archivedAccounts: [Account] {
+        accounts.filter { account in
+            account.isArchived == true
+        }
+    }
+    
+    // Reusable row view for an account.
+    @ViewBuilder
+    private func accountRow(for account: Account) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(account.name)
+                .font(.headline)
+            
+            Text(account.type.rawValue)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            
+            MoneyText(amount: account.balance)
+                .font(.subheadline)
+                .bold()
+        }
+        .padding(.vertical, 4)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            selectedAccount = account
+        }
+        .opacity(account.isArchived ? 0.6 : 1.0)
+    }
+    
+    // Marks an account as archived.
+    private func archiveAccount(_ account: Account) {
+        account.isArchived = true
+    }
+    
+    // Marks an account as active again.
+    private func unarchiveAccount(_ account: Account) {
+        account.isArchived = false
+    }
+}
+
+#Preview {
+    AccountsListView()
+}
+
+---END OF FILE---
+
+FILE: ./Views/Accounts/EditAccountView.swift
+//
+//  EditAccountView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 13/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+
+struct EditAccountView: View {
+    
+    @Environment(\.dismiss) private var dismiss
+    
+    // The account being edited.
+    let account: Account
+    
+    // Form state initialized from the account's current values.
+    @State private var name: String
+    @State private var selectedType: AccountType
+    @State private var balance: Double
+    
+    // Custom initializer to pre-fill the form.
+    init(account: Account) {
+        self.account = account
+        _name = State(initialValue: account.name)
+        _selectedType = State(initialValue: account.type)
+        _balance = State(initialValue: account.balance)
+    }
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Account Details") {
+                    TextField("Account Name", text: $name)
+                    
+                    Picker("Account Type", selection: $selectedType) {
+                        ForEach(AccountType.allCases, id: \.self) { type in
+                            Text(type.rawValue).tag(type)
+                        }
+                    }
+                    
+                    TextField("Balance", value: $balance, format: .number)
+                        .keyboardType(.decimalPad)
+                }
+            }
+            .navigationTitle("Edit Account")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save") {
+                        updateAccount()
+                    }
+                    .disabled(!isFormValid)
+                }
+            }
+        }
+    }
+    
+    // Basic validation for account editing.
+    private var isFormValid: Bool {
+        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
+    // Saves the updated account values.
+    private func updateAccount() {
+        guard isFormValid else { return }
+        
+        account.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        account.type = selectedType
+        account.balance = balance
+        
+        dismiss()
+    }
+}
+
+#Preview {
+    Text("EditAccountView Preview")
+}
+
+---END OF FILE---
+
+FILE: ./Views/Accounts/AddAccountView.swift
+//
+//  AddAccountView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+
+struct AddAccountView: View {
+    
+    // Gives access to the SwiftData context so we can save a new account.
+    @Environment(\.modelContext) private var modelContext
+    
+    // Gives us access to the dismiss action so we can close the sheet.
+    @Environment(\.dismiss) private var dismiss
+    
+    // Form field for the account name.
+    @State private var name = ""
+    
+    // Form field for the selected account type.
+    @State private var selectedType: AccountType = .checking
+    
+    // Form field for the starting balance.
+    @State private var balance = 0.0
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                
+                Section("Account Details") {
+                    
+                    // Text field for the account name.
+                    TextField("Account Name", text: $name)
+                    
+                    // Picker for selecting the account type.
+                    Picker("Account Type", selection: $selectedType) {
+                        ForEach(AccountType.allCases, id: \.self) { type in
+                            Text(type.rawValue).tag(type)
+                        }
+                    }
+                    
+                    // Field for entering the starting balance.
+                    // The currency format helps the user enter money values.
+                    TextField("Starting Balance", value: $balance, format: .number)
+                        .keyboardType(.decimalPad)
+                }
+            }
+            .navigationTitle("Add Account")
+            .toolbar {
+                
+                // Cancel button dismisses the sheet without saving.
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                
+                // Save button creates and inserts a new Account into SwiftData.
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save") {
+                        saveAccount()
+                    }
+                    // Disable saving if the name field is empty.
+                    .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+        }
+    }
+    
+    // This function creates a new account and inserts it into SwiftData.
+    private func saveAccount() {
+        let newAccount = Account(
+            name: name.trimmingCharacters(in: .whitespacesAndNewlines),
+            type: selectedType,
+            balance: balance
+        )
+        
+        // Insert the new account into the model context.
+        modelContext.insert(newAccount)
+        
+        // Close the sheet after saving.
+        dismiss()
+    }
+}
+
+#Preview {
+    AddAccountView()
+}
+
+---END OF FILE---
+
+FILE: ./Views/Root/MainTabView.swift
+//
+//  MainTabView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 10/04/2026.
+//
+
+import SwiftUI
+
+struct MainTabView: View {
+    var body: some View {
+        TabView {
+            
+            DashboardView()
+                .tabItem {
+                    Label("Dashboard", systemImage: "house")
+                }
+            
+            TransactionsListView()
+                .tabItem {
+                    Label("Transactions", systemImage: "list.bullet.rectangle")
+                }
+            
+            BudgetView()
+                .tabItem {
+                    Label("Budget", systemImage: "chart.pie")
+                }
+            
+            AccountsListView()
+                .tabItem {
+                    Label("Accounts", systemImage: "creditcard")
+                }
+            
+            SettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gearshape")
+                }
+        }
+    }
+}
+
+#Preview {
+    MainTabView()
+}
+
+---END OF FILE---
+
+FILE: ./Views/RecurringTransactions/AddRecurringTransactionView.swift
+//
+//  AddRecurringTransactionView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 13/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+
+struct AddRecurringTransactionView: View {
+    
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+    
+    @Query(sort: \Account.name) private var accounts: [Account]
+    @Query(sort: \Category.name) private var categories: [Category]
+    
+    @State private var title = ""
+    @State private var amount = 0.0
+    @State private var selectedType: TransactionType = .expense
+    @State private var selectedFrequency: RecurringFrequency = .monthly
+    @State private var nextDate = Date()
+    @State private var note = ""
+    @State private var selectedAccount: Account?
+    @State private var selectedToAccount: Account?
+    @State private var selectedCategory: Category?
+    @State private var isActive = true
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Recurring Rule") {
+                    TextField("Title", text: $title)
+                    
+                    Picker("Type", selection: $selectedType) {
+                        ForEach(TransactionType.allCases, id: \.self) { type in
+                            Text(type.rawValue).tag(type)
+                        }
+                    }
+                    
+                    TextField("Amount", value: $amount, format: .number)
+                        .keyboardType(.decimalPad)
+                    
+                    Picker("Frequency", selection: $selectedFrequency) {
+                        ForEach(RecurringFrequency.allCases, id: \.self) { frequency in
+                            Text(frequency.rawValue).tag(frequency)
+                        }
+                    }
+                    
+                    DatePicker("Next Date", selection: $nextDate, displayedComponents: .date)
+                    
+                    TextField("Note", text: $note)
+                    
+                    Toggle("Active", isOn: $isActive)
+                }
+                
+                Section("Accounts") {
+                    Picker("Account", selection: $selectedAccount) {
+                        Text("Select an account").tag(Account?.none)
+                        
+                        ForEach(activeAccounts) { account in
+                            Text(account.name).tag(Optional(account))
+                        }
+                    }
+                    
+                    if selectedType == .transfer {
+                        Picker("To Account", selection: $selectedToAccount) {
+                            Text("Select destination").tag(Account?.none)
+                            
+                            ForEach(activeAccounts) { account in
+                                Text(account.name).tag(Optional(account))
+                            }
+                        }
+                    }
+                }
+                
+                if selectedType != .transfer {
+                    Section("Category") {
+                        Picker("Category", selection: $selectedCategory) {
+                            Text("Select a category").tag(Category?.none)
+                            
+                            ForEach(filteredCategories) { category in
+                                Text(category.name).tag(Optional(category))
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Add Recurring")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save") {
+                        saveRecurringTransaction()
+                    }
+                    .disabled(!isFormValid)
+                }
+            }
+            .onChange(of: selectedType) { _, newType in
+                switch newType {
+                case .income:
+                    selectedToAccount = nil
+                    if selectedCategory?.kind != CategoryKind.income {
+                        selectedCategory = nil
+                    }
+                    
+                case .expense:
+                    selectedToAccount = nil
+                    if selectedCategory?.kind != CategoryKind.expense {
+                        selectedCategory = nil
+                    }
+                    
+                case .transfer:
+                    selectedCategory = nil
+                }
+            }
+        }
+    }
+    
+    // Returns only active accounts.
+    private var activeAccounts: [Account] {
+        accounts.filter { account in
+            account.isArchived == false
+        }
+    }
+    
+    // Filters categories to match the selected transaction type.
+    private var filteredCategories: [Category] {
+        switch selectedType {
+        case .income:
+            return categories.filter { category in
+                category.kind == CategoryKind.income
+            }
+        case .expense:
+            return categories.filter { category in
+                category.kind == CategoryKind.expense
+            }
+        case .transfer:
+            return []
+        }
+    }
+    
+    // Validates the recurring transaction form.
+    private var isFormValid: Bool {
+        let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard !trimmedTitle.isEmpty, amount > 0, selectedAccount != nil else {
+            return false
+        }
+        
+        switch selectedType {
+        case .income:
+            return selectedCategory?.kind == CategoryKind.income
+            
+        case .expense:
+            return selectedCategory?.kind == CategoryKind.expense
+            
+        case .transfer:
+            guard let selectedToAccount else { return false }
+            return selectedToAccount.id != selectedAccount?.id
+        }
+    }
+    
+    // Saves the recurring rule to SwiftData.
+    private func saveRecurringTransaction() {
+        guard isFormValid else { return }
+        
+        let newRecurringTransaction = RecurringTransaction(
+            title: title.trimmingCharacters(in: .whitespacesAndNewlines),
+            amount: amount,
+            type: selectedType,
+            frequency: selectedFrequency,
+            nextDate: nextDate,
+            note: note.trimmingCharacters(in: .whitespacesAndNewlines),
+            account: selectedAccount,
+            toAccount: selectedType == .transfer ? selectedToAccount : nil,
+            category: selectedType == .transfer ? nil : selectedCategory,
+            isActive: isActive
+        )
+        
+        modelContext.insert(newRecurringTransaction)
+        dismiss()
+    }
+}
+
+#Preview {
+    AddRecurringTransactionView()
+}
+
+---END OF FILE---
+
+FILE: ./Views/RecurringTransactions/RecurringTransactionsListView.swift
+//
+//  RecurringTransactionsListView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 13/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+
+struct RecurringTransactionsListView: View {
+    
+    @Environment(\.modelContext) private var modelContext
+    
+    @Query(sort: \RecurringTransaction.nextDate)
+    private var recurringTransactions: [RecurringTransaction]
+    
+    @State private var isShowingAddRecurringTransaction = false
+    
+    // Stores the recurring rule the user is about to delete.
+    @State private var recurringPendingDeletion: RecurringTransaction?
+    
+    var body: some View {
+        NavigationStack {
+            Group {
+                if recurringTransactions.isEmpty {
+                    ContentUnavailableView(
+                        "No Recurring Transactions Yet",
+                        systemImage: "arrow.triangle.2.circlepath",
+                        description: Text("Add recurring rules for things like rent, salary, or subscriptions.")
+                    )
+                } else {
+                    List {
+                        ForEach(recurringTransactions) { recurring in
+                            VStack(alignment: .leading, spacing: 8) {
+                                
+                                // Title
+                                Text(recurring.title)
+                                    .font(.headline)
+                                
+                                // Frequency and active/paused state
+                                HStack {
+                                    Text(recurring.frequency.rawValue)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                    
+                                    Spacer()
+                                    
+                                    Text(recurring.isActive ? "Active" : "Paused")
+                                        .font(.caption)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 4)
+                                        .background(recurring.isActive ? Color.green.opacity(0.15) : Color.gray.opacity(0.15))
+                                        .clipShape(Capsule())
+                                }
+                                
+                                // Due/upcoming state
+                                Text(RecurringTransactionService.isDue(recurring) ? "Due" : "Upcoming")
+                                    .font(.caption)
+                                    .bold()
+                                    .foregroundStyle(RecurringTransactionService.isDue(recurring) ? .red : .secondary)
+                                
+                                // Next date
+                                Text("Next: \(recurring.nextDate, format: .dateTime.day().month().year())")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                
+                                // Amount
+                                MoneyText(amount: recurring.amount)
+                                    .bold()
+                                
+                                // Apply button
+                                if recurring.isActive {
+                                    Button {
+                                        applyRecurringTransaction(recurring)
+                                    } label: {
+                                        Label("Apply Now", systemImage: "plus.circle")
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                    .tint(.accentColor)
+                                }
+                            }
+                            .padding(.vertical, 6)
+                            .swipeActions {
+                                Button(role: .destructive) {
+                                    recurringPendingDeletion = recurring
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Recurring")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        isShowingAddRecurringTransaction = true
+                    } label: {
+                        Label("Add Recurring Transaction", systemImage: "plus")
+                    }
+                }
+            }
+            .sheet(isPresented: $isShowingAddRecurringTransaction) {
+                AddRecurringTransactionView()
+            }
+            .confirmationDialog(
+                "Delete this recurring rule?",
+                isPresented: Binding(
+                    get: { recurringPendingDeletion != nil },
+                    set: { newValue in
+                        if newValue == false {
+                            recurringPendingDeletion = nil
+                        }
+                    }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Delete Recurring Rule", role: .destructive) {
+                    if let recurringPendingDeletion {
+                        deleteRecurringTransaction(recurringPendingDeletion)
+                        self.recurringPendingDeletion = nil
+                    }
+                }
+                
+                Button("Cancel", role: .cancel) {
+                    recurringPendingDeletion = nil
+                }
+            } message: {
+                Text("This will stop future automatic applications of this rule. Previously generated transactions will remain unchanged.")
+            }
+        }
+    }
+    
+    // Applies the recurring transaction rule through the service.
+    private func applyRecurringTransaction(_ recurring: RecurringTransaction) {
+        RecurringTransactionService.applyRecurringTransaction(recurring, in: modelContext)
+    }
+    
+    // Deletes only the recurring rule itself.
+    // Previously generated real transactions are not affected.
+    private func deleteRecurringTransaction(_ recurring: RecurringTransaction) {
+        modelContext.delete(recurring)
+    }
+}
+
+#Preview {
+    RecurringTransactionsListView()
+}
+
+---END OF FILE---
+
+FILE: ./Views/Categories/AddCategoryView.swift
+//
+//  AddCategoryView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+
+struct AddCategoryView: View {
+    
+    // Gives access to the SwiftData model context for saving the new category.
+    @Environment(\.modelContext) private var modelContext
+    
+    // Lets us dismiss the sheet after saving or canceling.
+    @Environment(\.dismiss) private var dismiss
+    
+    // User-entered category name.
+    @State private var name = ""
+    
+    // User-selected category kind.
+    @State private var selectedKind: CategoryKind = .expense
+    
+    // User-entered SF Symbol name.
+    @State private var iconName = "tag"
+    
+    // User-entered color hex string.
+    @State private var colorHex = "#007AFF"
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Category Details") {
+                    
+                    // Text field for category name.
+                    TextField("Category Name", text: $name)
+                    
+                    // Picker to choose whether the category is for income or expense.
+                    Picker("Category Type", selection: $selectedKind) {
+                        ForEach(CategoryKind.allCases, id: \.self) { kind in
+                            Text(kind.rawValue).tag(kind)
+                        }
+                    }
+                    
+                    // Text field for SF Symbol name.
+                    // Example: "cart", "house", "fork.knife"
+                    TextField("Icon Name", text: $iconName)
+                    
+                    // Text field for color in hex format.
+                    // We keep this simple for now.
+                    TextField("Color Hex", text: $colorHex)
+                        .textInputAutocapitalization(.never)
+                }
+            }
+            .navigationTitle("Add Category")
+            .toolbar {
+                
+                // Cancel button closes the sheet without saving.
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                
+                // Save button creates and inserts the category.
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save") {
+                        saveCategory()
+                    }
+                    .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+        }
+    }
+    
+    // Creates a new category and inserts it into SwiftData.
+    private func saveCategory() {
+        let newCategory = Category(
+            name: name.trimmingCharacters(in: .whitespacesAndNewlines),
+            kind: selectedKind,
+            iconName: iconName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "tag" : iconName,
+            colorHex: colorHex.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "#007AFF" : colorHex,
+            isSystem: false
+        )
+        
+        modelContext.insert(newCategory)
+        dismiss()
+    }
+}
+
+#Preview {
+    AddCategoryView()
+}
+
+---END OF FILE---
+
+FILE: ./Views/Categories/EditCategoryView.swift
+//
+//  EditCategoryView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 13/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+
+struct EditCategoryView: View {
+    
+    @Environment(\.dismiss) private var dismiss
+    
+    // The category being edited.
+    let category: Category
+    
+    // Form state initialized from the current category values.
+    @State private var name: String
+    @State private var selectedKind: CategoryKind
+    @State private var iconName: String
+    @State private var colorHex: String
+    
+    // Custom initializer to pre-fill the form.
+    init(category: Category) {
+        self.category = category
+        _name = State(initialValue: category.name)
+        _selectedKind = State(initialValue: category.kind)
+        _iconName = State(initialValue: category.iconName)
+        _colorHex = State(initialValue: category.colorHex)
+    }
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Category Details") {
+                    TextField("Category Name", text: $name)
+                    
+                    Picker("Category Type", selection: $selectedKind) {
+                        ForEach(CategoryKind.allCases, id: \.self) { kind in
+                            Text(kind.rawValue).tag(kind)
+                        }
+                    }
+                    
+                    TextField("Icon Name", text: $iconName)
+                    
+                    TextField("Color Hex", text: $colorHex)
+                        .textInputAutocapitalization(.never)
+                }
+            }
+            .navigationTitle("Edit Category")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save") {
+                        updateCategory()
+                    }
+                    .disabled(!isFormValid)
+                }
+            }
+        }
+    }
+    
+    // Basic validation for category editing.
+    private var isFormValid: Bool {
+        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
+    // Saves the updated category values.
+    private func updateCategory() {
+        guard isFormValid else { return }
+        
+        category.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        category.kind = selectedKind
+        category.iconName = iconName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "tag" : iconName.trimmingCharacters(in: .whitespacesAndNewlines)
+        category.colorHex = colorHex.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "#007AFF" : colorHex.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        dismiss()
+    }
+}
+
+#Preview {
+    Text("EditCategoryView Preview")
+}
+
+---END OF FILE---
+
+FILE: ./Views/Categories/CategoriesListView.swift
+//
+//  CategoriesListView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+
+struct CategoriesListView: View {
+    
+    @Environment(\.modelContext) private var modelContext
+    
+    @Query(sort: \Category.name) private var categories: [Category]
+    
+    @State private var isShowingAddCategory = false
+    
+    // Stores the category currently selected for editing.
+    @State private var selectedCategory: Category?
+    
+    var body: some View {
+        NavigationStack {
+            Group {
+                if categories.isEmpty {
+                    ContentUnavailableView(
+                        "No Categories Yet",
+                        systemImage: "tag",
+                        description: Text("Add categories to organize your income and expenses.")
+                    )
+                } else {
+                    List {
+                        ForEach(categories) { category in
+                            HStack(spacing: 12) {
+                                Image(systemName: category.iconName)
+                                    .foregroundStyle(.blue)
+                                    .frame(width: 24)
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(category.name)
+                                        .font(.headline)
+                                    
+                                    Text(category.kind.rawValue)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .padding(.vertical, 4)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                selectedCategory = category
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Categories")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        isShowingAddCategory = true
+                    } label: {
+                        Label("Add Category", systemImage: "plus")
+                    }
+                }
+            }
+            .sheet(isPresented: $isShowingAddCategory) {
+                AddCategoryView()
+            }
+            .sheet(item: $selectedCategory) { category in
+                EditCategoryView(category: category)
+            }
+        }
+    }
+}
+
+#Preview {
+    CategoriesListView()
+}
+
+---END OF FILE---
+
+FILE: ./Views/Onboarding/OnboardingView.swift
+//
+//  OnboardingView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 13/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+
+struct OnboardingView: View {
+    
+    @Environment(\.modelContext) private var modelContext
+    
+    // Marks whether the user has finished onboarding.
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    
+    // Form state for the first account.
+    @State private var accountName = ""
+    @State private var selectedType: AccountType = .checking
+    @State private var startingBalance = 0.0
+    
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 24) {
+                
+                Spacer()
+                
+                VStack(spacing: 12) {
+                    Text("Welcome to Financio")
+                        .font(.largeTitle)
+                        .bold()
+                    
+                    Text("Track your money, set budgets, and understand your spending with clarity.")
+                        .font(.body)
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal)
+                }
+                
+                Form {
+                    Section("Create Your First Account") {
+                        TextField("Account Name", text: $accountName)
+                        
+                        Picker("Account Type", selection: $selectedType) {
+                            ForEach(AccountType.allCases, id: \.self) { type in
+                                Text(type.rawValue).tag(type)
+                            }
+                        }
+                        
+                        TextField("Starting Balance", value: $startingBalance, format: .number)
+                            .keyboardType(.decimalPad)
+                    }
+                }
+                .frame(maxHeight: 250)
+                
+                Button {
+                    completeOnboarding()
+                } label: {
+                    Text("Get Started")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.accentColor)
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .padding(.horizontal)
+                .disabled(accountName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                
+                Spacer()
+            }
+            .navigationBarBackButtonHidden(true)
+        }
+    }
+    
+    // Creates the user's first account and marks onboarding as complete.
+    private func completeOnboarding() {
+        let firstAccount = Account(
+            name: accountName.trimmingCharacters(in: .whitespacesAndNewlines),
+            type: selectedType,
+            balance: startingBalance
+        )
+        
+        modelContext.insert(firstAccount)
+        hasCompletedOnboarding = true
+    }
+}
+
+#Preview {
+    OnboardingView()
+}
+
+---END OF FILE---
+
+FILE: ./Views/Reports/ReportsView.swift
+//
+//  ReportsView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 13/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+import Charts
+
+struct ReportsView: View {
+    
+    // Fetch all transactions sorted by date.
+    @Query(sort: \BudgetTransaction.date)
+    private var transactions: [BudgetTransaction]
+    
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    
+                    // Section title
+                    Text("Monthly Income vs Expenses")
+                        .font(.title2)
+                        .bold()
+                        .padding(.horizontal)
+                    
+                    if monthlyReportData.isEmpty {
+                        ContentUnavailableView(
+                            "No Report Data Yet",
+                            systemImage: "chart.bar.doc.horizontal",
+                            description: Text("Add transactions over time to see monthly reports.")
+                        )
+                    } else {
+                        Chart {
+                            ForEach(monthlyReportData, id: \.monthLabel) { item in
+                                
+                                // Income bar
+                                BarMark(
+                                    x: .value("Month", item.monthLabel),
+                                    y: .value("Income", item.income)
+                                )
+                                .foregroundStyle(.green)
+                                .position(by: .value("Type", "Income"))
+                                
+                                // Expense bar
+                                BarMark(
+                                    x: .value("Month", item.monthLabel),
+                                    y: .value("Expenses", item.expenses)
+                                )
+                                .foregroundStyle(.red)
+                                .position(by: .value("Type", "Expenses"))
+                            }
+                        }
+                        .frame(height: 260)
+                        .padding(.horizontal)
+                    }
+                    
+                    // Net cash flow summary section
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Net Cash Flow by Month")
+                            .font(.title2)
+                            .bold()
+                        
+                        if monthlyReportData.isEmpty {
+                            ContentUnavailableView(
+                                "No Cash Flow Data Yet",
+                                systemImage: "chart.line.uptrend.xyaxis",
+                                description: Text("Monthly cash flow will appear here once you add transactions.")
+                            )
+                        } else {
+                            ForEach(monthlyReportData, id: \.monthLabel) { item in
+                                HStack {
+                                    Text(item.monthLabel)
+                                        .font(.headline)
+                                    
+                                    Spacer()
+                                    
+                                    MoneyText(amount: item.netCashFlow)
+                                        .bold()
+                                        .foregroundStyle(item.netCashFlow >= 0 ? .green : .red)
+                                }
+                                .padding()
+                                .background(Color(.systemGray6))
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                .padding(.vertical)
+            }
+            .navigationTitle("Reports")
+        }
+    }
+    
+    // Aggregates transactions into monthly report entries.
+    private var monthlyReportData: [MonthlyReportItem] {
+        let calendar = Calendar.current
+        
+        // Dictionary keyed by "year-month" to accumulate values.
+        var groupedData: [String: MonthlyReportItem] = [:]
+        
+        for transaction in transactions {
+            let year = calendar.component(.year, from: transaction.date)
+            let month = calendar.component(.month, from: transaction.date)
+            
+            let key = "\(year)-\(month)"
+            let monthLabel = formattedMonthLabel(year: year, month: month)
+            
+            // If no entry exists for this month yet, create one.
+            if groupedData[key] == nil {
+                groupedData[key] = MonthlyReportItem(
+                    monthKey: key,
+                    monthLabel: monthLabel,
+                    income: 0,
+                    expenses: 0
+                )
+            }
+            
+            // Update the correct monthly totals depending on transaction type.
+            switch transaction.type {
+            case .income:
+                groupedData[key]?.income += transaction.amount
+            case .expense:
+                groupedData[key]?.expenses += transaction.amount
+            case .transfer:
+                // Transfers do not count as income or expenses in reports.
+                break
+            }
+        }
+        
+        // Return sorted by month key so the chart appears in chronological order.
+        return groupedData.values.sorted { first, second in
+            first.monthKey < second.monthKey
+        }
+    }
+    
+    // Builds a short readable month label like "Apr 2026".
+    private func formattedMonthLabel(year: Int, month: Int) -> String {
+        var components = DateComponents()
+        components.year = year
+        components.month = month
+        
+        let calendar = Calendar.current
+        let date = calendar.date(from: components) ?? Date()
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM yyyy"
+        
+        return formatter.string(from: date)
+    }
+}
+
+// A simple struct representing one month of report data.
+struct MonthlyReportItem {
+    let monthKey: String
+    let monthLabel: String
+    var income: Double
+    var expenses: Double
+    
+    // Computed property for monthly net cash flow.
+    var netCashFlow: Double {
+        income - expenses
+    }
+}
+
+#Preview {
+    ReportsView()
+}
+
+---END OF FILE---
+
+FILE: ./Views/Budget/AddBudgetView.swift
+//
+//  AddBudgetView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+
+struct AddBudgetView: View {
+    
+    // SwiftData context for saving new budgets.
+    @Environment(\.modelContext) private var modelContext
+    
+    // Dismiss action to close the sheet.
+    @Environment(\.dismiss) private var dismiss
+    
+    // Fetch all categories from SwiftData.
+    @Query(sort: \Category.name) private var categories: [Category]
+    
+    // Fetch all budgets so we can check for duplicates.
+    @Query private var budgets: [Budget]
+    
+    // The month and year are passed in from BudgetView.
+    let month: Int
+    let year: Int
+    
+    // Form state
+    @State private var selectedCategory: Category?
+    @State private var plannedAmount = 0.0
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Budget Details") {
+                    
+                    Picker("Category", selection: $selectedCategory) {
+                        Text("Select a category").tag(Category?.none)
+                        
+                        ForEach(expenseCategories) { category in
+                            Text(category.name).tag(Optional(category))
+                        }
+                    }
+                    
+                    TextField("Planned Amount", value: $plannedAmount, format: .number)
+                        .keyboardType(.decimalPad)
+                }
+                
+                // Show a warning if the selected category already has
+                // a budget for the same month and year.
+                if selectedCategory != nil && duplicateBudgetExists {
+                    Section {
+                        Text("A budget already exists for this category this month.")
+                            .font(.subheadline)
+                            .foregroundStyle(.red)
+                    }
+                }
+            }
+            .navigationTitle("Add Budget")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save") {
+                        saveBudget()
+                    }
+                    .disabled(!isFormValid)
+                }
+            }
+        }
+    }
+    
+    // Returns only expense categories, because budgets are mainly for spending.
+    private var expenseCategories: [Category] {
+        categories.filter { category in
+            category.kind == CategoryKind.expense
+        }
+    }
+    
+    // Returns true if a budget already exists for the selected category
+    // in the same month and year.
+    private var duplicateBudgetExists: Bool {
+        guard let selectedCategory else { return false }
+        
+        return budgets.contains { budget in
+            budget.month == month &&
+            budget.year == year &&
+            budget.category?.id == selectedCategory.id
+        }
+    }
+    
+    // Determines whether the form can be saved.
+    private var isFormValid: Bool {
+        selectedCategory != nil &&
+        plannedAmount > 0 &&
+        !duplicateBudgetExists
+    }
+    
+    // Creates and saves a new budget entry.
+    private func saveBudget() {
+        guard let selectedCategory else { return }
+        
+        let newBudget = Budget(
+            month: month,
+            year: year,
+            plannedAmount: plannedAmount,
+            category: selectedCategory
+        )
+        
+        modelContext.insert(newBudget)
+        dismiss()
+    }
+}
+
+#Preview {
+    AddBudgetView(month: 4, year: 2026)
+}
+
+---END OF FILE---
+
+FILE: ./Views/Budget/BudgetView.swift
+//
+//  BudgetView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+
+struct BudgetView: View {
+    
+    @Environment(\.modelContext) private var modelContext
+    
+    @Query private var budgets: [Budget]
+    @Query private var transactions: [BudgetTransaction]
+    
+    @State private var isShowingAddBudget = false
+    @State private var selectedBudget: Budget?
+    
+    // Stores the budget the user is about to delete.
+    @State private var budgetPendingDeletion: Budget?
+    
+    @State private var selectedMonth = Calendar.current.component(.month, from: Date())
+    @State private var selectedYear = Calendar.current.component(.year, from: Date())
+    
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                
+                HStack {
+                    Button {
+                        goToPreviousMonth()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                    }
+                    
+                    Spacer()
+                    
+                    Text(monthYearTitle)
+                        .font(.headline)
+                    
+                    Spacer()
+                    
+                    Button {
+                        goToNextMonth()
+                    } label: {
+                        Image(systemName: "chevron.right")
+                    }
+                }
+                .padding()
+                
+                Group {
+                    if selectedMonthBudgets.isEmpty {
+                        ContentUnavailableView(
+                            "No Budgets Yet",
+                            systemImage: "chart.pie",
+                            description: Text("Add your first monthly budget to start planning your spending.")
+                        )
+                    } else {
+                        List {
+                            ForEach(selectedMonthBudgets) { budget in
+                                VStack(alignment: .leading, spacing: 10) {
+                                    
+                                    Text(budget.category?.name ?? "Unknown Category")
+                                        .font(.headline)
+                                    
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text("Planned")
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                            MoneyText(amount: budget.plannedAmount)
+                                                .font(.subheadline)
+                                        }
+                                        
+                                        Spacer()
+                                        
+                                        VStack(alignment: .center, spacing: 4) {
+                                            Text("Spent")
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                            MoneyText(amount: spentAmount(for: budget))
+                                                .font(.subheadline)
+                                                .foregroundStyle(.red)
+                                        }
+                                        
+                                        Spacer()
+                                        
+                                        VStack(alignment: .trailing, spacing: 4) {
+                                            Text("Remaining")
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                            MoneyText(amount: remainingAmount(for: budget))
+                                                .font(.subheadline)
+                                                .bold()
+                                                .foregroundStyle(remainingAmount(for: budget) >= 0 ? .green : .red)
+                                        }
+                                    }
+                                    
+                                    VStack(alignment: .leading, spacing: 6) {
+                                        ProgressView(value: progressValue(for: budget))
+                                            .tint(progressColor(for: budget))
+                                        
+                                        Text(progressText(for: budget))
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                                .padding(.vertical, 8)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    selectedBudget = budget
+                                }
+                                .swipeActions {
+                                    Button(role: .destructive) {
+                                        budgetPendingDeletion = budget
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Budget")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        isShowingAddBudget = true
+                    } label: {
+                        Label("Add Budget", systemImage: "plus")
+                    }
+                }
+            }
+            .sheet(isPresented: $isShowingAddBudget) {
+                AddBudgetView(month: selectedMonth, year: selectedYear)
+            }
+            .sheet(item: $selectedBudget) { budget in
+                EditBudgetView(budget: budget)
+            }
+            .confirmationDialog(
+                "Delete this budget?",
+                isPresented: Binding(
+                    get: { budgetPendingDeletion != nil },
+                    set: { newValue in
+                        if newValue == false {
+                            budgetPendingDeletion = nil
+                        }
+                    }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Delete Budget", role: .destructive) {
+                    if let budgetPendingDeletion {
+                        deleteBudget(budgetPendingDeletion)
+                        self.budgetPendingDeletion = nil
+                    }
+                }
+                
+                Button("Cancel", role: .cancel) {
+                    budgetPendingDeletion = nil
+                }
+            } message: {
+                Text("This will permanently remove the budget entry for the selected month.")
+            }
+        }
+    }
+    
+    private var selectedMonthBudgets: [Budget] {
+        budgets.filter { budget in
+            budget.month == selectedMonth && budget.year == selectedYear
+        }
+    }
+    
+    private var monthYearTitle: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "LLLL yyyy"
+        
+        var components = DateComponents()
+        components.month = selectedMonth
+        components.year = selectedYear
+        
+        let calendar = Calendar.current
+        let date = calendar.date(from: components) ?? Date()
+        
+        return formatter.string(from: date)
+    }
+    
+    private func spentAmount(for budget: Budget) -> Double {
+        guard let category = budget.category else { return 0 }
+        
+        return transactions
+            .filter { transaction in
+                transaction.type == .expense &&
+                transaction.category?.id == category.id &&
+                isInSelectedMonth(transaction.date)
+            }
+            .reduce(0) { partialResult, transaction in
+                partialResult + transaction.amount
+            }
+    }
+    
+    private func remainingAmount(for budget: Budget) -> Double {
+        budget.plannedAmount - spentAmount(for: budget)
+    }
+    
+    private func progressValue(for budget: Budget) -> Double {
+        guard budget.plannedAmount > 0 else { return 0 }
+        
+        let ratio = spentAmount(for: budget) / budget.plannedAmount
+        return min(ratio, 1.0)
+    }
+    
+    private func progressText(for budget: Budget) -> String {
+        guard budget.plannedAmount > 0 else { return "No budget set" }
+        
+        let percentage = (spentAmount(for: budget) / budget.plannedAmount) * 100
+        return String(format: "%.0f%% of budget used", percentage)
+    }
+    
+    private func progressColor(for budget: Budget) -> Color {
+        remainingAmount(for: budget) >= 0 ? .blue : .red
+    }
+    
+    private func isInSelectedMonth(_ date: Date) -> Bool {
+        let calendar = Calendar.current
+        let month = calendar.component(.month, from: date)
+        let year = calendar.component(.year, from: date)
+        
+        return month == selectedMonth && year == selectedYear
+    }
+    
+    private func goToPreviousMonth() {
+        if selectedMonth == 1 {
+            selectedMonth = 12
+            selectedYear -= 1
+        } else {
+            selectedMonth -= 1
+        }
+    }
+    
+    private func goToNextMonth() {
+        if selectedMonth == 12 {
+            selectedMonth = 1
+            selectedYear += 1
+        } else {
+            selectedMonth += 1
+        }
+    }
+    
+    private func deleteBudget(_ budget: Budget) {
+        modelContext.delete(budget)
+    }
+}
+
+#Preview {
+    BudgetView()
+}
+
+---END OF FILE---
+
+FILE: ./Views/Budget/EditBudgetView.swift
+//
+//  EditBudgetView.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 13/04/2026.
+//
+
+import SwiftUI
+import SwiftData
+
+struct EditBudgetView: View {
+    
+    @Environment(\.dismiss) private var dismiss
+    
+    // Fetch categories to populate the category picker.
+    @Query(sort: \Category.name) private var categories: [Category]
+    
+    // Fetch all budgets so we can prevent duplicates.
+    @Query private var budgets: [Budget]
+    
+    // The budget being edited.
+    let budget: Budget
+    
+    // Form state
+    @State private var selectedCategory: Category?
+    @State private var plannedAmount: Double
+    
+    // Initialize form fields with the existing budget values.
+    init(budget: Budget) {
+        self.budget = budget
+        _selectedCategory = State(initialValue: budget.category)
+        _plannedAmount = State(initialValue: budget.plannedAmount)
+    }
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Budget Details") {
+                    Picker("Category", selection: $selectedCategory) {
+                        Text("Select a category").tag(Category?.none)
+                        
+                        ForEach(expenseCategories) { category in
+                            Text(category.name).tag(Optional(category))
+                        }
+                    }
+                    
+                    TextField("Planned Amount", value: $plannedAmount, format: .number)
+                        .keyboardType(.decimalPad)
+                }
+                
+                // Show a warning if editing would create a duplicate budget.
+                if selectedCategory != nil && duplicateBudgetExists {
+                    Section {
+                        Text("Another budget already exists for this category this month.")
+                            .font(.subheadline)
+                            .foregroundStyle(.red)
+                    }
+                }
+            }
+            .navigationTitle("Edit Budget")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save") {
+                        updateBudget()
+                    }
+                    .disabled(!isFormValid)
+                }
+            }
+        }
+    }
+    
+    // Only expense categories should be budgeted.
+    private var expenseCategories: [Category] {
+        categories.filter { category in
+            category.kind == CategoryKind.expense
+        }
+    }
+    
+    // Checks whether another budget already exists for the same
+    // category, month, and year.
+    private var duplicateBudgetExists: Bool {
+        guard let selectedCategory else { return false }
+        
+        return budgets.contains { existingBudget in
+            existingBudget.id != budget.id &&
+            existingBudget.month == budget.month &&
+            existingBudget.year == budget.year &&
+            existingBudget.category?.id == selectedCategory.id
+        }
+    }
+    
+    private var isFormValid: Bool {
+        selectedCategory != nil &&
+        plannedAmount > 0 &&
+        !duplicateBudgetExists
+    }
+    
+    private func updateBudget() {
+        guard isFormValid else { return }
+        guard let selectedCategory else { return }
+        
+        budget.category = selectedCategory
+        budget.plannedAmount = plannedAmount
+        
+        dismiss()
+    }
+}
+
+#Preview {
+    Text("EditBudgetView Preview")
+}
+
+---END OF FILE---
+
+FILE: ./Services/RecurringTransactionService.swift
+//
+//  RecurringTransactionService.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 13/04/2026.
+//
+
+import Foundation
+import SwiftData
+
+struct RecurringTransactionService {
+    
+    // Applies a recurring rule by creating a real transaction,
+    // applying its balance effect, and advancing the rule's next date.
+    static func applyRecurringTransaction(_ recurring: RecurringTransaction, in modelContext: ModelContext) {
+        // Create a real transaction from the recurring rule.
+        let newTransaction = BudgetTransaction(
+            title: recurring.title,
+            amount: recurring.amount,
+            date: recurring.nextDate,
+            type: recurring.type,
+            note: recurring.note,
+            account: recurring.account,
+            toAccount: recurring.type == .transfer ? recurring.toAccount : nil,
+            category: recurring.type == .transfer ? nil : recurring.category
+        )
+        
+        // Apply the balance effect using the shared service.
+        TransactionBalanceService.apply(newTransaction)
+        
+        // Insert the new transaction into SwiftData.
+        modelContext.insert(newTransaction)
+        
+        // Move the recurring rule's next date forward.
+        recurring.nextDate = nextDate(after: recurring.nextDate, frequency: recurring.frequency)
+    }
+    
+    // Computes the next scheduled date based on the recurring frequency.
+    static func nextDate(after date: Date, frequency: RecurringFrequency) -> Date {
+        let calendar = Calendar.current
+        
+        switch frequency {
+        case .weekly:
+            return calendar.date(byAdding: .day, value: 7, to: date) ?? date
+        case .monthly:
+            return calendar.date(byAdding: .month, value: 1, to: date) ?? date
+        case .yearly:
+            return calendar.date(byAdding: .year, value: 1, to: date) ?? date
+        }
+    }
+    
+    // Returns whether the recurring transaction is due today or overdue.
+    static func isDue(_ recurring: RecurringTransaction) -> Bool {
+        recurring.nextDate <= Date()
+    }
+}
+
+---END OF FILE---
+
+FILE: ./Services/BudgetCalculator.swift
+//
+//  BudgetCalculator.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+
+---END OF FILE---
+
+FILE: ./Services/DefaultCategorySeeder.swift
+//
+//  DefaultCategorySeeder.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 13/04/2026.
+//
+
+import Foundation
+import SwiftData
+
+struct DefaultCategorySeeder {
+    
+    // Inserts default categories only if no categories exist yet.
+    static func seedCategoriesIfNeeded(in modelContext: ModelContext, existingCategories: [Category]) {
+        // If categories already exist, do nothing.
+        guard existingCategories.isEmpty else { return }
+        
+        let defaultCategories: [Category] = [
+            // Expense categories
+            Category(name: "Groceries", kind: .expense, iconName: "cart", colorHex: "#34C759", isSystem: true),
+            Category(name: "Rent", kind: .expense, iconName: "house", colorHex: "#FF9500", isSystem: true),
+            Category(name: "Transport", kind: .expense, iconName: "car", colorHex: "#007AFF", isSystem: true),
+            Category(name: "Utilities", kind: .expense, iconName: "bolt", colorHex: "#FFD60A", isSystem: true),
+            Category(name: "Entertainment", kind: .expense, iconName: "gamecontroller", colorHex: "#AF52DE", isSystem: true),
+            Category(name: "Dining Out", kind: .expense, iconName: "fork.knife", colorHex: "#FF3B30", isSystem: true),
+            
+            // Income categories
+            Category(name: "Salary", kind: .income, iconName: "banknote", colorHex: "#30D158", isSystem: true),
+            Category(name: "Freelance", kind: .income, iconName: "laptopcomputer", colorHex: "#64D2FF", isSystem: true),
+            Category(name: "Gift", kind: .income, iconName: "gift", colorHex: "#BF5AF2", isSystem: true)
+        ]
+        
+        for category in defaultCategories {
+            modelContext.insert(category)
+        }
+    }
+}
+
+---END OF FILE---
+
+FILE: ./Services/CurrencyManager.swift
+//
+//  CurrencyManager.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 13/04/2026.
+//
+
+import Foundation
+
+struct CurrencyOption: Identifiable, Hashable {
+    let id = UUID()
+    let code: String
+    let name: String
+    let symbol: String
+}
+
+struct CurrencyManager {
+    
+    // A list of currency options available in the app.
+    // We keep this short for MVP, but you can add more later.
+    static let supportedCurrencies: [CurrencyOption] = [
+        CurrencyOption(code: "USD", name: "US Dollar", symbol: "$"),
+        CurrencyOption(code: "EUR", name: "Euro", symbol: "€"),
+        CurrencyOption(code: "GBP", name: "British Pound", symbol: "£"),
+        CurrencyOption(code: "CAD", name: "Canadian Dollar", symbol: "CA$"),
+        CurrencyOption(code: "AUD", name: "Australian Dollar", symbol: "A$"),
+        CurrencyOption(code: "JPY", name: "Japanese Yen", symbol: "¥")
+    ]
+}
+
+---END OF FILE---
+
+FILE: ./Services/TransactionBalanceService.swift
+//
+//  TransactionBalanceService.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 13/04/2026.
+//
+
+import Foundation
+
+struct TransactionBalanceService {
+    
+    // Applies a transaction's balance effect to the related account(s).
+    // Use this when creating a new transaction or after editing a transaction.
+    static func apply(_ transaction: BudgetTransaction) {
+        switch transaction.type {
+        case .income:
+            // Income increases the selected account balance.
+            if let account = transaction.account {
+                account.balance += transaction.amount
+            }
+            
+        case .expense:
+            // Expense decreases the selected account balance.
+            if let account = transaction.account {
+                account.balance -= transaction.amount
+            }
+            
+        case .transfer:
+            // Transfer moves money from one account to another.
+            if let fromAccount = transaction.account {
+                fromAccount.balance -= transaction.amount
+            }
+            
+            if let toAccount = transaction.toAccount {
+                toAccount.balance += transaction.amount
+            }
+        }
+    }
+    
+    // Reverses a transaction's balance effect from the related account(s).
+    // Use this before deleting a transaction or before changing an existing one.
+    static func reverse(_ transaction: BudgetTransaction) {
+        switch transaction.type {
+        case .income:
+            // Reversing income removes that money from the account.
+            if let account = transaction.account {
+                account.balance -= transaction.amount
+            }
+            
+        case .expense:
+            // Reversing expense puts the money back into the account.
+            if let account = transaction.account {
+                account.balance += transaction.amount
+            }
+            
+        case .transfer:
+            // Reversing a transfer restores the money to the source account
+            // and removes it from the destination account.
+            if let fromAccount = transaction.account {
+                fromAccount.balance += transaction.amount
+            }
+            
+            if let toAccount = transaction.toAccount {
+                toAccount.balance -= transaction.amount
+            }
+        }
+    }
+}
+
+---END OF FILE---
+
+FILE: ./Services/DateHelper.swift
+//
+//  DateHelper.swift
+//  Financio
+//
+//  Created by Ariane Boulet on 12/04/2026.
+//
+
+
+---END OF FILE---
+

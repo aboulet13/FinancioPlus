@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "AD727BD9-04ED-4D71-8D39-92A84B29C0BC",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Financio.xcodeproj",
+      "identifier" : "DA6C15012F892BED00FD5F18",
+      "name" : "Financio"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Financio.xcodeproj",
+        "identifier" : "DA6C15102F892BF200FD5F18",
+        "name" : "FinancioTests"
+      }
+    }
+  ],
+  "version" : 1
+}

@@ -1,0 +1,1185 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		DA13E4F62FBECF5100D19B11 /* NetWorthSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA13E4F52FBECF5000D19B11 /* NetWorthSnapshot.swift */; };
+		DA13E4F72FBECF5100D19B11 /* NetWorthSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA13E4F52FBECF5000D19B11 /* NetWorthSnapshot.swift */; };
+		DA13E4F92FBED17900D19B11 /* SmartCategorizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA13E4F82FBED17600D19B11 /* SmartCategorizer.swift */; };
+		DA2E3E382FB85AAD0096BB5C /* AccountsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87A32F8BCB9800972118 /* AccountsViewModel.swift */; };
+		DA2E3E3C2FB8664E0096BB5C /* SavingsGoals.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E3E3B2FB8664B0096BB5C /* SavingsGoals.swift */; };
+		DA2E3E3E2FB866D90096BB5C /* SavingsGoalsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E3E3D2FB866D50096BB5C /* SavingsGoalsViewModel.swift */; };
+		DA2E3E452FB867FB0096BB5C /* SavingsGoalsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E3E442FB867F90096BB5C /* SavingsGoalsListView.swift */; };
+		DA2E3E472FB86B2D0096BB5C /* AddSavingsGoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E3E462FB86B2B0096BB5C /* AddSavingsGoalView.swift */; };
+		DA2E3E492FB86C190096BB5C /* EditSavingsGoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E3E482FB86C180096BB5C /* EditSavingsGoalView.swift */; };
+		DA2E3E522FB873DB0096BB5C /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA2E3E512FB873DB0096BB5C /* WidgetKit.framework */; };
+		DA2E3E542FB873DB0096BB5C /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA2E3E532FB873DB0096BB5C /* SwiftUI.framework */; };
+		DA2E3E612FB873DC0096BB5C /* FinancioWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DA2E3E4F2FB873DB0096BB5C /* FinancioWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DA2E3E692FB874890096BB5C /* SharedSwiftData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E3E682FB874860096BB5C /* SharedSwiftData.swift */; };
+		DA2E3E6A2FB874A80096BB5C /* SharedSwiftData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E3E682FB874860096BB5C /* SharedSwiftData.swift */; };
+		DA2E3E6B2FB875B90096BB5C /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD879E2F8BCB6200972118 /* Account.swift */; };
+		DA2E3E6C2FB87F000096BB5C /* BudgetTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD879F2F8BCB6F00972118 /* BudgetTransaction.swift */; };
+		DA2E3E6D2FB87F050096BB5C /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87A02F8BCB7700972118 /* Category.swift */; };
+		DA2E3E6E2FB87F0B0096BB5C /* Budget.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87A12F8BCB8100972118 /* Budget.swift */; };
+		DA2E3E6F2FB87F100096BB5C /* RecurringTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC425612F8D27D7007C0D84 /* RecurringTransaction.swift */; };
+		DA2E3E702FB87F150096BB5C /* SavingsGoals.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E3E3B2FB8664B0096BB5C /* SavingsGoals.swift */; };
+		DA2E3E722FB899120096BB5C /* BiometricAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E3E712FB899100096BB5C /* BiometricAuthManager.swift */; };
+		DA2E3E752FB899430096BB5C /* LockScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E3E742FB899410096BB5C /* LockScreenView.swift */; };
+		DA2E3E772FB89D060096BB5C /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E3E762FB89D050096BB5C /* NotificationManager.swift */; };
+		DA832A702FBE495E00F82553 /* NetWorthChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA832A6F2FBE495D00F82553 /* NetWorthChartView.swift */; };
+		DAB05FE62FC0734700607505 /* IconPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB05FE52FC0734600607505 /* IconPickerView.swift */; };
+		DAB05FE82FC078C500607505 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB05FE72FC0745500607505 /* Color+Hex.swift */; };
+		DAB05FE92FC078C500607505 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB05FE72FC0745500607505 /* Color+Hex.swift */; };
+		DAB0721C2FBF914D009504AE /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB0721B2FBF914A009504AE /* HapticManager.swift */; };
+		DAB0721E2FBF98C3009504AE /* SheetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB0721D2FBF98C2009504AE /* SheetManager.swift */; };
+		DAB072202FBF99DC009504AE /* QuickAddMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB0721F2FBF99DB009504AE /* QuickAddMenu.swift */; };
+		DAB15C2D2F8C13DC00AB3607 /* EditTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB15C2C2F8C13DB00AB3607 /* EditTransactionView.swift */; };
+		DAB15C2F2F8CBAA900AB3607 /* EditBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB15C2E2F8CBAA100AB3607 /* EditBudgetView.swift */; };
+		DAB15C312F8CBB1A00AB3607 /* EditAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB15C302F8CBB1300AB3607 /* EditAccountView.swift */; };
+		DAB15C332F8CBBD700AB3607 /* EditCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB15C322F8CBBD500AB3607 /* EditCategoryView.swift */; };
+		DAC425512F8CE382007C0D84 /* CurrencyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC425502F8CE2A1007C0D84 /* CurrencyManager.swift */; };
+		DAC425522F8CE38A007C0D84 /* DateHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87A82F8BCBEF00972118 /* DateHelper.swift */; };
+		DAC425532F8CE38E007C0D84 /* BudgetCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87A62F8BCBB800972118 /* BudgetCalculator.swift */; };
+		DAC425552F8CE9A6007C0D84 /* TransactionBalanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC425542F8CE9A3007C0D84 /* TransactionBalanceService.swift */; };
+		DAC425582F8CF1E9007C0D84 /* MoneyText.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC425572F8CF1E6007C0D84 /* MoneyText.swift */; };
+		DAC4255B2F8CF592007C0D84 /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC4255A2F8CF58D007C0D84 /* ReportsView.swift */; };
+		DAC4255D2F8D0D77007C0D84 /* DefaultCategorySeeder.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC4255C2F8D0D75007C0D84 /* DefaultCategorySeeder.swift */; };
+		DAC425602F8D111B007C0D84 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC4255F2F8D1118007C0D84 /* OnboardingView.swift */; };
+		DAC425622F8D27D9007C0D84 /* RecurringTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC425612F8D27D7007C0D84 /* RecurringTransaction.swift */; };
+		DAC425652F8D2905007C0D84 /* RecurringTransactionsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC425642F8D28FD007C0D84 /* RecurringTransactionsListView.swift */; };
+		DAC425672F8D46A6007C0D84 /* AddRecurringTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC425662F8D46A4007C0D84 /* AddRecurringTransactionView.swift */; };
+		DAC425692F8D48A7007C0D84 /* RecurringTransactionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC425682F8D48A5007C0D84 /* RecurringTransactionService.swift */; };
+		DAE9B0C22FB7A0100009B318 /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87A22F8BCB9200972118 /* DashboardViewModel.swift */; };
+		DAE9B0C32FB7A1E70009B318 /* BudgetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87A52F8BCBA700972118 /* BudgetViewModel.swift */; };
+		DAE9B0C42FB7A9A90009B318 /* TransactionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87A42F8BCBA000972118 /* TransactionsViewModel.swift */; };
+		DAFD87732F8BC7E100972118 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAFD876F2F8BC7E100972118 /* Assets.xcassets */; };
+		DAFD87742F8BC7E100972118 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87702F8BC7E100972118 /* MainTabView.swift */; };
+		DAFD87752F8BC7E100972118 /* Financio+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87712F8BC7E100972118 /* Financio+App.swift */; };
+		DAFD87AB2F8BCC9300972118 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87AA2F8BCC8A00972118 /* DashboardView.swift */; };
+		DAFD87AD2F8BCC9E00972118 /* AccountsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87AC2F8BCC9D00972118 /* AccountsListView.swift */; };
+		DAFD87AF2F8BCCA700972118 /* AddAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87AE2F8BCCA600972118 /* AddAccountView.swift */; };
+		DAFD87B12F8BCCB300972118 /* TransactionsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87B02F8BCCAD00972118 /* TransactionsListView.swift */; };
+		DAFD87B32F8BCCB700972118 /* AddTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87B22F8BCCB600972118 /* AddTransactionView.swift */; };
+		DAFD87B52F8BCCBF00972118 /* BudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87B42F8BCCBE00972118 /* BudgetView.swift */; };
+		DAFD87B72F8BCCCB00972118 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87B62F8BCCC900972118 /* SettingsView.swift */; };
+		DAFD87B82F8BD84800972118 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD879E2F8BCB6200972118 /* Account.swift */; };
+		DAFD87B92F8BD8CC00972118 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87A02F8BCB7700972118 /* Category.swift */; };
+		DAFD87BA2F8BDA4200972118 /* BudgetTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD879F2F8BCB6F00972118 /* BudgetTransaction.swift */; };
+		DAFD87BB2F8BDB2D00972118 /* Budget.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87A12F8BCB8100972118 /* Budget.swift */; };
+		DAFD87BF2F8BE79E00972118 /* CategoriesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87BE2F8BE79C00972118 /* CategoriesListView.swift */; };
+		DAFD87C12F8BE7AA00972118 /* AddCategoryView.swift in Sources */ = {isa = PBXFileReference; fileRef = DAFD87C02F8BE7A800972118 /* AddCategoryView.swift */; };
+		DAFD87C32F8BEDA500972118 /* SummaryCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87C22F8BED9F00972118 /* SummaryCardView.swift */; };
+		DAFD87C52F8BEF4F00972118 /* AddBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFD87C42F8BEF4E00972118 /* AddBudgetView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		DA2E3E5F2FB873DC0096BB5C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA6C14FA2F892BED00FD5F18 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DA2E3E4E2FB873DB0096BB5C;
+			remoteInfo = FinancioWidgetExtension;
+		};
+		DA6C15122F892BF200FD5F18 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA6C14FA2F892BED00FD5F18 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DA6C15012F892BED00FD5F18;
+			remoteInfo = Financio;
+		};
+		DA6C151C2F892BF200FD5F18 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA6C14FA2F892BED00FD5F18 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DA6C15012F892BED00FD5F18;
+			remoteInfo = Financio;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		DA2E3E662FB873DC0096BB5C /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				DA2E3E612FB873DC0096BB5C /* FinancioWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		DA13E4F52FBECF5000D19B11 /* NetWorthSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetWorthSnapshot.swift; sourceTree = "<group>"; };
+		DA13E4F82FBED17600D19B11 /* SmartCategorizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartCategorizer.swift; sourceTree = "<group>"; };
+		DA13E50A2FBEE74300D19B11 /* Financio-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Financio-Info.plist"; sourceTree = "<group>"; };
+		DA2E3E3B2FB8664B0096BB5C /* SavingsGoals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsGoals.swift; sourceTree = "<group>"; };
+		DA2E3E3D2FB8665D0096BB5C /* SavingsGoalsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsGoalsViewModel.swift; sourceTree = "<group>"; };
+		DA2E3E442FB867F90096BB5C /* SavingsGoalsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsGoalsListView.swift; sourceTree = "<group>"; };
+		DA2E3E462FB86B2B0096BB5C /* AddSavingsGoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSavingsGoalView.swift; sourceTree = "<group>"; };
+		DA2E3E482FB86C180096BB5C /* EditSavingsGoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditSavingsGoalView.swift; sourceTree = "<group>"; };
+		DA2E3E4A2FB8733B0096BB5C /* Financio.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Financio.entitlements; sourceTree = "<group>"; };
+		DA2E3E4F2FB873DB0096BB5C /* FinancioWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FinancioWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA2E3E512FB873DB0096BB5C /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		DA2E3E532FB873DB0096BB5C /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		DA2E3E672FB873FF0096BB5C /* FinancioWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FinancioWidgetExtension.entitlements; sourceTree = "<group>"; };
+		DA2E3E682FB874860096BB5C /* SharedSwiftData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedSwiftData.swift; sourceTree = "<group>"; };
+		DA2E3E712FB899100096BB5C /* BiometricAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuthManager.swift; sourceTree = "<group>"; };
+		DA2E3E742FB899410096BB5C /* LockScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockScreenView.swift; sourceTree = "<group>"; };
+		DA2E3E762FB89D050096BB5C /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		DA586D2A2FBC9067007CC74A /* Financio.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Financio.xctestplan; sourceTree = "<group>"; };
+		DA6C15022F892BED00FD5F18 /* Financio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Financio.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA6C15112F892BF200FD5F18 /* FinancioTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinancioTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA6C151B2F892BF200FD5F18 /* FinancioUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinancioUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA832A6F2FBE495D00F82553 /* NetWorthChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetWorthChartView.swift; sourceTree = "<group>"; };
+		DAB05FE52FC0734600607505 /* IconPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconPickerView.swift; sourceTree = "<group>"; };
+		DAB05FE72FC0745500607505 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
+		DAB0721B2FBF914A009504AE /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
+		DAB0721D2FBF98C2009504AE /* SheetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetManager.swift; sourceTree = "<group>"; };
+		DAB0721F2FBF99DB009504AE /* QuickAddMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickAddMenu.swift; sourceTree = "<group>"; };
+		DAB15C2C2F8C13DB00AB3607 /* EditTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTransactionView.swift; sourceTree = "<group>"; };
+		DAB15C2E2F8CBAA100AB3607 /* EditBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditBudgetView.swift; sourceTree = "<group>"; };
+		DAB15C302F8CBB1300AB3607 /* EditAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditAccountView.swift; sourceTree = "<group>"; };
+		DAB15C322F8CBBD500AB3607 /* EditCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCategoryView.swift; sourceTree = "<group>"; };
+		DAC425502F8CE2A1007C0D84 /* CurrencyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyManager.swift; sourceTree = "<group>"; };
+		DAC425422F8CE9A3007C0D84 /* TransactionBalanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionBalanceService.swift; sourceTree = "<group>"; };
+		DAC425572F8CF1E6007C0D84 /* MoneyText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyText.swift; sourceTree = "<group>"; };
+		DAC4255A2F8CF58D007C0D84 /* ReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsView.swift; sourceTree = "<group>"; };
+		DAC4255C2F8D0D75007C0D84 /* DefaultCategorySeeder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultCategorySeeder.swift; sourceTree = "<group>"; };
+		DAC4255F2F8D1118007C0D84 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		DAC425612F8D27D7007C0D84 /* RecurringTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringTransaction.swift; sourceTree = "<group>"; };
+		DAC425642F8D28FD007C0D84 /* RecurringTransactionsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringTransactionsListView.swift; sourceTree = "<group>"; };
+		DAC425662F8D46A4007C0D84 /* AddRecurringTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRecurringTransactionView.swift; sourceTree = "<group>"; };
+		DAC425682F8D48A5007C0D84 /* RecurringTransactionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringTransactionService.swift; sourceTree = "<group>"; };
+		DAFD876F2F8BC7E100972118 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		DAFD87702F8BC7E100972118 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		DAFD87712F8BC7E100972118 /* Financio+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Financio+App.swift"; sourceTree = "<group>"; };
+		DAFD879E2F8BCB6200972118 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
+		DAFD879F2F8BCB6F00972118 /* BudgetTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetTransaction.swift; sourceTree = "<group>"; };
+		DAFD87A02F8BCB7700972118 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
+		DAFD87A12F8BCB8100972118 /* Budget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Budget.swift; sourceTree = "<group>"; };
+		DAFD87A22F8BCB9200972118 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
+		DAFD87A32F8BCB9800972118 /* AccountsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsViewModel.swift; sourceTree = "<group>"; };
+		DAFD87A42F8BCBA000972118 /* TransactionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsViewModel.swift; sourceTree = "<group>"; };
+		DAFD87A52F8BCBA700972118 /* BudgetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetViewModel.swift; sourceTree = "<group>"; };
+		DAFD87A62F8BCBB800972118 /* BudgetCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetCalculator.swift; sourceTree = "<group>"; };
+		DAFD87A82F8BCBEF00972118 /* DateHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateHelper.swift; sourceTree = "<group>"; };
+		DAFD87A92F8BCC0000972118 /* Color+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+App.swift"; sourceTree = "<group>"; };
+		DAFD87AA2F8BCC8A00972118 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		DAFD87AC2F8BCC9D00972118 /* AccountsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsListView.swift; sourceTree = "<group>"; };
+		DAFD87AE2F8BCCA600972118 /* AddAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddAccountView.swift; sourceTree = "<group>"; };
+		DAFD87B02F8BCCAD00972118 /* TransactionsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsListView.swift; sourceTree = "<group>"; };
+		DAFD87B22F8BCCB600972118 /* AddTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionView.swift; sourceTree = "<group>"; };
+		DAFD87B42F8BCCBE00972118 /* BudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetView.swift; sourceTree = "<group>"; };
+		DAFD87B62F8BCCC900972118 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		DAFD87BE2F8BE79C00972118 /* CategoriesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesListView.swift; sourceTree = "<group>"; };
+		DAFD87C02F8BE7A800972118 /* AddCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCategoryView.swift; sourceTree = "<group>"; };
+		DAFD87C22F8BED9F00972118 /* SummaryCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryCardView.swift; sourceTree = "<group>"; };
+		DAFD87C42F8BEF4E00972118 /* AddBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBudgetView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		DA2E3E622FB873DC0096BB5C /* Exceptions for "FinancioWidget" folder in "FinancioWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = DA2E3E4E2FB873DB0096BB5C /* FinancioWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		DA2E3E552FB873DB0096BB5C /* FinancioWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				DA2E3E622FB873DC0096BB5C /* Exceptions for "FinancioWidget" folder in "FinancioWidgetExtension" target */,
+			);
+			path = FinancioWidget;
+			sourceTree = "<group>";
+		};
+		DA6C15142F892BF200FD5F18 /* FinancioTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FinancioTests;
+			sourceTree = "<group>";
+		};
+		DA6C151E2F892BF200FD5F18 /* FinancioUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FinancioUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DA2E3E4C2FB873DB0096BB5C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA2E3E542FB873DB0096BB5C /* SwiftUI.framework in Frameworks */,
+				DA2E3E522FB873DB0096BB5C /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA6C14FF2F892BED00FD5F18 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA6C150E2F892BF200FD5F18 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA6C15182F892BF200FD5F18 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		DA2E3E432FB867E90096BB5C /* SavingsGoals */ = {
+			isa = PBXGroup;
+			children = (
+				DA2E3E482FB86C180096BB5C /* EditSavingsGoalView.swift */,
+				DA2E3E462FB86B2B0096BB5C /* AddSavingsGoalView.swift */,
+				DA2E3E442FB867F90096BB5C /* SavingsGoalsListView.swift */,
+			);
+			path = SavingsGoals;
+			sourceTree = "<group>";
+		};
+		DA2E3E502FB873DB0096BB5C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DA2E3E512FB873DB0096BB5C /* WidgetKit.framework */,
+				DA2E3E532FB873DB0096BB5C /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DA2E3E732FB899390096BB5C /* Security */ = {
+			isa = PBXGroup;
+			children = (
+				DA2E3E742FB899410096BB5C /* LockScreenView.swift */,
+			);
+			path = Security;
+			sourceTree = "<group>";
+		};
+		DA6C14F92F892BED00FD5F18 = {
+			isa = PBXGroup;
+			children = (
+				DA13E50A2FBEE74300D19B11 /* Financio-Info.plist */,
+				DA586D2A2FBC9067007CC74A /* Financio.xctestplan */,
+				DA2E3E672FB873FF0096BB5C /* FinancioWidgetExtension.entitlements */,
+				DA2E3E4A2FB8733B0096BB5C /* Financio.entitlements */,
+				DA6C15142F892BF200FD5F18 /* FinancioTests */,
+				DA6C151E2F892BF200FD5F18 /* FinancioUITests */,
+				DAFD87922F8BC97B00972118 /* App */,
+				DAFD87942F8BC97B00972118 /* Extensions */,
+				DAFD87952F8BC97B00972118 /* Models */,
+				DA2E3E552FB873DB0096BB5C /* FinancioWidget */,
+				DA2E3E502FB873DB0096BB5C /* Frameworks */,
+				DA6C15032F892BED00FD5F18 /* Products */,
+				DAFD87932F8BC97B00972118 /* Resources */,
+				DAFD87972F8BC97B00972118 /* Services */,
+				DAFD87982F8BC97B00972118 /* ViewModels */,
+				DAFD87962F8BC97B00972118 /* Views */,
+			);
+			sourceTree = "<group>";
+		};
+		DA6C15032F892BED00FD5F18 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DA6C15022F892BED00FD5F18 /* Financio.app */,
+				DA6C15112F892BF200FD5F18 /* FinancioTests.xctest */,
+				DA6C151B2F892BF200FD5F18 /* FinancioUITests.xctest */,
+				DA2E3E4F2FB873DB0096BB5C /* FinancioWidgetExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DAC425562F8CF1DE007C0D84 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				DAB05FE52FC0734600607505 /* IconPickerView.swift */,
+				DAB0721F2FBF99DB009504AE /* QuickAddMenu.swift */,
+				DAC425572F8CF1E6007C0D84 /* MoneyText.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		DAC425592F8CF584007C0D84 /* Reports */ = {
+			isa = PBXGroup;
+			children = (
+				DAC4255A2F8CF58D007C0D84 /* ReportsView.swift */,
+			);
+			path = Reports;
+			sourceTree = "<group>";
+		};
+		DAC4255E2F8D1111007C0D84 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				DAC4255F2F8D1118007C0D84 /* OnboardingView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		DAC425632F8D28C9007C0D84 /* RecurringTransactions */ = {
+			isa = PBXGroup;
+			children = (
+				DAC425662F8D46A4007C0D84 /* AddRecurringTransactionView.swift */,
+				DAC425642F8D28FD007C0D84 /* RecurringTransactionsListView.swift */,
+			);
+			path = RecurringTransactions;
+			sourceTree = "<group>";
+		};
+		DAFD87922F8BC97B00972118 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				DAFD87712F8BC7E100972118 /* Financio+App.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		DAFD87932F8BC97B00972118 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				DAFD876F2F8BC7E100972118 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		DAFD87942F8BC97B00972118 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				DAB05FE72FC0745500607505 /* Color+Hex.swift */,
+				DAFD87A92F8BCC0000972118 /* Color+App.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		DAFD87952F8BC97B00972118 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				DA13E4F52FBECF5000D19B11 /* NetWorthSnapshot.swift */,
+				DA2E3E3B2FB8664B0096BB5C /* SavingsGoals.swift */,
+				DAC425612F8D27D7007C0D84 /* RecurringTransaction.swift */,
+				DAFD87A12F8BCB8100972118 /* Budget.swift */,
+				DAFD87A02F8BCB7700972118 /* Category.swift */,
+				DAFD879F2F8BCB6F00972118 /* BudgetTransaction.swift */,
+				DAFD879E2F8BCB6200972118 /* Account.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		DAFD87962F8BC97B00972118 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				DA2E3E732FB899390096BB5C /* Security */,
+				DA2E3E432FB867E90096BB5C /* SavingsGoals */,
+				DAC425632F8D28C9007C0D84 /* RecurringTransactions */,
+				DAC4255E2F8D1111007C0D84 /* Onboarding */,
+				DAC425592F8CF584007C0D84 /* Reports */,
+				DAC425562F8CF1DE007C0D84 /* Components */,
+				DAFD87BC2F8BDFBD00972118 /* Root */,
+				DAFD87992F8BC98700972118 /* Dashboard */,
+				DAFD879B2F8BC99B00972118 /* Transactions */,
+				DAFD879C2F8BC9A400972118 /* Budget */,
+				DAFD879A2F8BC99400972118 /* Accounts */,
+				DAFD879D2F8BC9AC00972118 /* Settings */,
+				DAFD87BD2F8BE77A00972118 /* Categories */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		DAFD87972F8BC97B00972118 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				DAB0721D2FBF98C2009504AE /* SheetManager.swift */,
+				DAB0721B2FBF914A009504AE /* HapticManager.swift */,
+				DA13E4F82FBED17600D19B11 /* SmartCategorizer.swift */,
+				DA2E3E762FB89D050096BB5C /* NotificationManager.swift */,
+				DA2E3E712FB899100096BB5C /* BiometricAuthManager.swift */,
+				DA2E3E682FB874860096BB5C /* SharedSwiftData.swift */,
+				DAC425682F8D48A5007C0D84 /* RecurringTransactionService.swift */,
+				DAC4255C2F8D0D75007C0D84 /* DefaultCategorySeeder.swift */,
+				DAC425422F8CE9A3007C0D84 /* TransactionBalanceService.swift */,
+				DAC425502F8CE2A1007C0D84 /* CurrencyManager.swift */,
+				DAFD87A82F8BCBEF00972118 /* DateHelper.swift */,
+				DAFD87A62F8BCBB800972118 /* BudgetCalculator.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		DAFD87982F8BC97B00972118 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				DA2E3E3D2FB8665D0096BB5C /* SavingsGoalsViewModel.swift */,
+				DAFD87A52F8BCBA700972118 /* BudgetViewModel.swift */,
+				DAFD87A42F8BCBA000972118 /* TransactionsViewModel.swift */,
+				DAFD87A32F8BCB9800972118 /* AccountsViewModel.swift */,
+				DAFD87A22F8BCB9200972118 /* DashboardViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		DAFD87992F8BC98700972118 /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				DA832A6F2FBE495D00F82553 /* NetWorthChartView.swift */,
+				DAFD87C22F8BED9F00972118 /* SummaryCardView.swift */,
+				DAFD87AA2F8BCC8A00972118 /* DashboardView.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+		DAFD879A2F8BC99400972118 /* Accounts */ = {
+			isa = PBXGroup;
+			children = (
+				DAB15C302F8CBB1300AB3607 /* EditAccountView.swift */,
+				DAFD87AE2F8BCCA600972118 /* AddAccountView.swift */,
+				DAFD87AC2F8BCC9D00972118 /* AccountsListView.swift */,
+			);
+			path = Accounts;
+			sourceTree = "<group>";
+		};
+		DAFD879B2F8BC99B00972118 /* Transactions */ = {
+			isa = PBXGroup;
+			children = (
+				DAB15C2C2F8C13DB00AB3607 /* EditTransactionView.swift */,
+				DAFD87B22F8BCCB600972118 /* AddTransactionView.swift */,
+				DAFD87B02F8BCCAD00972118 /* TransactionsListView.swift */,
+			);
+			path = Transactions;
+			sourceTree = "<group>";
+		};
+		DAFD879C2F8BC9A400972118 /* Budget */ = {
+			isa = PBXGroup;
+			children = (
+				DAB15C2E2F8CBAA100AB3607 /* EditBudgetView.swift */,
+				DAFD87C42F8BEF4E00972118 /* AddBudgetView.swift */,
+				DAFD87B42F8BCCBE00972118 /* BudgetView.swift */,
+			);
+			path = Budget;
+			sourceTree = "<group>";
+		};
+		DAFD879D2F8BC9AC00972118 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				DAFD87B62F8BCCC900972118 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		DAFD87BC2F8BDFBD00972118 /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				DAFD87702F8BC7E100972118 /* MainTabView.swift */,
+			);
+			path = Root;
+			sourceTree = "<group>";
+		};
+		DAFD87BD2F8BE77A00972118 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				DAB15C322F8CBBD500AB3607 /* EditCategoryView.swift */,
+				DAFD87BE2F8BE79C00972118 /* CategoriesListView.swift */,
+				DAFD87C02F8BE7A800972118 /* AddCategoryView.swift */,
+			);
+			path = Categories;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DA2E3E4E2FB873DB0096BB5C /* FinancioWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DA2E3E632FB873DC0096BB5C /* Build configuration list for PBXNativeTarget "FinancioWidgetExtension" */;
+			buildPhases = (
+				DA2E3E4B2FB873DB0096BB5C /* Sources */,
+				DA2E3E4C2FB873DB0096BB5C /* Frameworks */,
+				DA2E3E4D2FB873DB0096BB5C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				DA2E3E552FB873DB0096BB5C /* FinancioWidget */,
+			);
+			name = FinancioWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = FinancioWidgetExtension;
+			productReference = DA2E3E4F2FB873DB0096BB5C /* FinancioWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		DA6C15012F892BED00FD5F18 /* Financio */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DA6C15252F892BF200FD5F18 /* Build configuration list for PBXNativeTarget "Financio" */;
+			buildPhases = (
+				DA6C14FE2F892BED00FD5F18 /* Sources */,
+				DA6C14FF2F892BED00FD5F18 /* Frameworks */,
+				DA6C15002F892BED00FD5F18 /* Resources */,
+				DA2E3E662FB873DC0096BB5C /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DA2E3E602FB873DC0096BB5C /* PBXTargetDependency */,
+			);
+			name = Financio;
+			packageProductDependencies = (
+			);
+			productName = Financio;
+			productReference = DA6C15022F892BED00FD5F18 /* Financio.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DA6C15102F892BF200FD5F18 /* FinancioTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DA6C15282F892BF200FD5F18 /* Build configuration list for PBXNativeTarget "FinancioTests" */;
+			buildPhases = (
+				DA6C150D2F892BF200FD5F18 /* Sources */,
+				DA6C150E2F892BF200FD5F18 /* Frameworks */,
+				DA6C150F2F892BF200FD5F18 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DA6C15132F892BF200FD5F18 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				DA6C15142F892BF200FD5F18 /* FinancioTests */,
+			);
+			name = FinancioTests;
+			packageProductDependencies = (
+			);
+			productName = FinancioTests;
+			productReference = DA6C15112F892BF200FD5F18 /* FinancioTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		DA6C151A2F892BF200FD5F18 /* FinancioUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DA6C152B2F892BF200FD5F18 /* Build configuration list for PBXNativeTarget "FinancioUITests" */;
+			buildPhases = (
+				DA6C15172F892BF200FD5F18 /* Sources */,
+				DA6C15182F892BF200FD5F18 /* Frameworks */,
+				DA6C15192F892BF200FD5F18 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DA6C151D2F892BF200FD5F18 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				DA6C151E2F892BF200FD5F18 /* FinancioUITests */,
+			);
+			name = FinancioUITests;
+			packageProductDependencies = (
+			);
+			productName = FinancioUITests;
+			productReference = DA6C151B2F892BF200FD5F18 /* FinancioUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DA6C14FA2F892BED00FD5F18 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2650;
+				LastUpgradeCheck = 2650;
+				TargetAttributes = {
+					DA2E3E4E2FB873DB0096BB5C = {
+						CreatedOnToolsVersion = 26.5;
+					};
+					DA6C15012F892BED00FD5F18 = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					DA6C15102F892BF200FD5F18 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = DA6C15012F892BED00FD5F18;
+					};
+					DA6C151A2F892BF200FD5F18 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = DA6C15012F892BED00FD5F18;
+					};
+				};
+			};
+			buildConfigurationList = DA6C14FD2F892BED00FD5F18 /* Build configuration list for PBXProject "Financio" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = DA6C14F92F892BED00FD5F18;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = DA6C15032F892BED00FD5F18 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DA6C15012F892BED00FD5F18 /* Financio */,
+				DA6C15102F892BF200FD5F18 /* FinancioTests */,
+				DA6C151A2F892BF200FD5F18 /* FinancioUITests */,
+				DA2E3E4E2FB873DB0096BB5C /* FinancioWidgetExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DA2E3E4D2FB873DB0096BB5C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA6C15002F892BED00FD5F18 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAFD87732F8BC7E100972118 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA6C150F2F892BF200FD5F18 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA6C15192F892BF200FD5F18 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DA2E3E4B2FB873DB0096BB5C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA2E3E6B2FB875B90096BB5C /* Account.swift in Sources */,
+				DA2E3E6F2FB87F100096BB5C /* RecurringTransaction.swift in Sources */,
+				DAB05FE92FC078C500607505 /* Color+Hex.swift in Sources */,
+				DA2E3E6C2FB87F000096BB5C /* BudgetTransaction.swift in Sources */,
+				DA2E3E6E2FB87F0B0096BB5C /* Budget.swift in Sources */,
+				DA2E3E702FB87F150096BB5C /* SavingsGoals.swift in Sources */,
+				DA2E3E6A2FB874A80096BB5C /* SharedSwiftData.swift in Sources */,
+				DA13E4F62FBECF5100D19B11 /* NetWorthSnapshot.swift in Sources */,
+				DA2E3E6D2FB87F050096BB5C /* Category.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA6C14FE2F892BED00FD5F18 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAC425602F8D111B007C0D84 /* OnboardingView.swift in Sources */,
+				DAFD87B32F8BCCB700972118 /* AddTransactionView.swift in Sources */,
+				DA2E3E382FB85AAD0096BB5C /* AccountsViewModel.swift in Sources */,
+				DAC425582F8CF1E9007C0D84 /* MoneyText.swift in Sources */,
+				DA2E3E722FB899120096BB5C /* BiometricAuthManager.swift in Sources */,
+				DAB15C332F8CBBD700AB3607 /* EditCategoryView.swift in Sources */,
+				DA2E3E452FB867FB0096BB5C /* SavingsGoalsListView.swift in Sources */,
+				DAFD87B52F8BCCBF00972118 /* BudgetView.swift in Sources */,
+				DA2E3E492FB86C190096BB5C /* EditSavingsGoalView.swift in Sources */,
+				DAC425672F8D46A6007C0D84 /* AddRecurringTransactionView.swift in Sources */,
+				DAFD87BA2F8BDA4200972118 /* BudgetTransaction.swift in Sources */,
+				DAFD87C32F8BEDA500972118 /* SummaryCardView.swift in Sources */,
+				DA13E4F72FBECF5100D19B11 /* NetWorthSnapshot.swift in Sources */,
+				DAFD87C12F8BE7AA00972118 /* AddCategoryView.swift in Sources */,
+				DAFD87C52F8BEF4F00972118 /* AddBudgetView.swift in Sources */,
+				DAC425552F8CE9A6007C0D84 /* TransactionBalanceService.swift in Sources */,
+				DA2E3E3C2FB8664E0096BB5C /* SavingsGoals.swift in Sources */,
+				DAB05FE82FC078C500607505 /* Color+Hex.swift in Sources */,
+				DAC425652F8D2905007C0D84 /* RecurringTransactionsListView.swift in Sources */,
+				DAC4255D2F8D0D77007C0D84 /* DefaultCategorySeeder.swift in Sources */,
+				DAFD87AD2F8BCC9E00972118 /* AccountsListView.swift in Sources */,
+				DAFD87BF2F8BE79E00972118 /* CategoriesListView.swift in Sources */,
+				DAFD87B72F8BCCCB00972118 /* SettingsView.swift in Sources */,
+				DAFD87B12F8BCCB300972118 /* TransactionsListView.swift in Sources */,
+				DA2E3E772FB89D060096BB5C /* NotificationManager.swift in Sources */,
+				DA2E3E752FB899430096BB5C /* LockScreenView.swift in Sources */,
+				DAFD87B82F8BD84800972118 /* Account.swift in Sources */,
+				DAB0721C2FBF914D009504AE /* HapticManager.swift in Sources */,
+				DAC425692F8D48A7007C0D84 /* RecurringTransactionService.swift in Sources */,
+				DAE9B0C42FB7A9A90009B318 /* TransactionsViewModel.swift in Sources */,
+				DAB15C2F2F8CBAA900AB3607 /* EditBudgetView.swift in Sources */,
+				DAFD87BB2F8BDB2D00972118 /* Budget.swift in Sources */,
+				DA2E3E472FB86B2D0096BB5C /* AddSavingsGoalView.swift in Sources */,
+				DA2E3E692FB874890096BB5C /* SharedSwiftData.swift in Sources */,
+				DAC4255B2F8CF592007C0D84 /* ReportsView.swift in Sources */,
+				DAB0721E2FBF98C3009504AE /* SheetManager.swift in Sources */,
+				DAFD87742F8BC7E100972118 /* MainTabView.swift in Sources */,
+				DAB072202FBF99DC009504AE /* QuickAddMenu.swift in Sources */,
+				DAC425622F8D27D9007C0D84 /* RecurringTransaction.swift in Sources */,
+				DA13E4F92FBED17900D19B11 /* SmartCategorizer.swift in Sources */,
+				DAB15C312F8CBB1A00AB3607 /* EditAccountView.swift in Sources */,
+				DAE9B0C22FB7A0100009B318 /* DashboardViewModel.swift in Sources */,
+				DAFD87AF2F8BCCA700972118 /* AddAccountView.swift in Sources */,
+				DAFD87AB2F8BCC9300972118 /* DashboardView.swift in Sources */,
+				DA2E3E3E2FB866D90096BB5C /* SavingsGoalsViewModel.swift in Sources */,
+				DAC425512F8CE382007C0D84 /* CurrencyManager.swift in Sources */,
+				DAFD87752F8BC7E100972118 /* Financio+App.swift in Sources */,
+				DA832A702FBE495E00F82553 /* NetWorthChartView.swift in Sources */,
+				DAE9B0C32FB7A1E70009B318 /* BudgetViewModel.swift in Sources */,
+				DAFD87B92F8BD8CC00972118 /* Category.swift in Sources */,
+				DAC425522F8CE38A007C0D84 /* DateHelper.swift in Sources */,
+				DAC425532F8CE38E007C0D84 /* BudgetCalculator.swift in Sources */,
+				DAB05FE62FC0734700607505 /* IconPickerView.swift in Sources */,
+				DAB15C2D2F8C13DC00AB3607 /* EditTransactionView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA6C150D2F892BF200FD5F18 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA6C15172F892BF200FD5F18 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DA2E3E602FB873DC0096BB5C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DA2E3E4E2FB873DB0096BB5C /* FinancioWidgetExtension */;
+			targetProxy = DA2E3E5F2FB873DC0096BB5C /* PBXContainerItemProxy */;
+		};
+		DA6C15132F892BF200FD5F18 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DA6C15012F892BED00FD5F18 /* Financio */;
+			targetProxy = DA6C15122F892BF200FD5F18 /* PBXContainerItemProxy */;
+		};
+		DA6C151D2F892BF200FD5F18 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DA6C15012F892BED00FD5F18 /* Financio */;
+			targetProxy = DA6C151C2F892BF200FD5F18 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		DA2E3E642FB873DC0096BB5C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = FinancioWidgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4MD9WYD2S3;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FinancioWidget/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Ariane-Boulet.Financio3.FinancioWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DA2E3E652FB873DC0096BB5C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = FinancioWidgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4MD9WYD2S3;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FinancioWidget/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Ariane-Boulet.Financio3.FinancioWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		DA6C15232F892BF200FD5F18 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 4MD9WYD2S3;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		DA6C15242F892BF200FD5F18 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 4MD9WYD2S3;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		DA6C15262F892BF200FD5F18 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Financio.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4MD9WYD2S3;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Financio-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Financio+";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Financio uses Face ID to keep your financial data secure and private.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Ariane-Boulet.Financio3";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DA6C15272F892BF200FD5F18 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Financio.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4MD9WYD2S3;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Financio-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Financio+";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Financio uses Face ID to keep your financial data secure and private.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Ariane-Boulet.Financio3";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		DA6C15292F892BF200FD5F18 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4MD9WYD2S3;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Ariane-Boulet.FinancioTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Financio.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Financio";
+			};
+			name = Debug;
+		};
+		DA6C152A2F892BF200FD5F18 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4MD9WYD2S3;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Ariane-Boulet.FinancioTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Financio.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Financio";
+			};
+			name = Release;
+		};
+		DA6C152C2F892BF200FD5F18 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4MD9WYD2S3;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Ariane-Boulet.FinancioUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Financio;
+			};
+			name = Debug;
+		};
+		DA6C152D2F892BF200FD5F18 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4MD9WYD2S3;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Ariane-Boulet.FinancioUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Financio;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		DA2E3E632FB873DC0096BB5C /* Build configuration list for PBXNativeTarget "FinancioWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA2E3E642FB873DC0096BB5C /* Debug */,
+				DA2E3E652FB873DC0096BB5C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DA6C14FD2F892BED00FD5F18 /* Build configuration list for PBXProject "Financio" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA6C15232F892BF200FD5F18 /* Debug */,
+				DA6C15242F892BF200FD5F18 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DA6C15252F892BF200FD5F18 /* Build configuration list for PBXNativeTarget "Financio" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA6C15262F892BF200FD5F18 /* Debug */,
+				DA6C15272F892BF200FD5F18 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DA6C15282F892BF200FD5F18 /* Build configuration list for PBXNativeTarget "FinancioTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA6C15292F892BF200FD5F18 /* Debug */,
+				DA6C152A2F892BF200FD5F18 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DA6C152B2F892BF200FD5F18 /* Build configuration list for PBXNativeTarget "FinancioUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA6C152C2F892BF200FD5F18 /* Debug */,
+				DA6C152D2F892BF200FD5F18 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = DA6C14FA2F892BED00FD5F18 /* Project object */;
+}

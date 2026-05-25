@@ -1,0 +1,33 @@
+# ===============
+# Xcode Project Files
+# ===============
+build/
+DerivedData/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.movedInProductFiles
+.Assetcache/
+
+# ===============
+# iOS Device / Simulator Cache
+# ===============
+*.xcuserstate
+*.xccheckout
+*.xcscheme
+!default.xcscheme
+xs SanityCheck/
+
+# ===============
+# OS / System Files
+# ===============
+.DS_Store
+Thumbs.db
+.spotlight-V100
+.Trashes/
+
+# ===============
+# Swift Package Manager / Dependencies
+# ===============
+.build/
+Packages/
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata

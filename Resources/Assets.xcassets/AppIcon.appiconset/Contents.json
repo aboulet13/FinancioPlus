@@ -1,10 +1,9 @@
 {
   "images" : [
     {
-<<<<<<< HEAD
+
       "filename" : "F (2).png",
-=======
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
+
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"

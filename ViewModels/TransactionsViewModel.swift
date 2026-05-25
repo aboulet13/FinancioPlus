@@ -5,7 +5,6 @@
 //  Created by Ariane Boulet on 12/04/2026.
 //
 
-<<<<<<< HEAD
 import Foundation
 import SwiftUI
 
@@ -84,5 +83,3 @@ struct TransactionsViewModel {
         }
     }
 }
-=======
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38

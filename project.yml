@@ -1,0 +1,23 @@
+name: Financio
+options:
+  bundleIdPrefix: Ariane-Boulet
+targets:
+  Financio:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: "."
+        excludes:
+          - "project.yml"
+          - ".gitignore"
+          - "FinancioWidget"
+          - "FinancioTests"
+          - "FinancioUITests"
+          
+  FinancioWidgetExtension:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: "FinancioWidget"

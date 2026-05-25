@@ -5,14 +5,6 @@
 //  Created by Ariane Boulet on 12/04/2026.
 //
 
-<<<<<<< HEAD
-//
-//  SettingsView.swift
-//  Financio
-//
-
-=======
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
 import SwiftUI
 import SwiftData
 
@@ -25,23 +17,16 @@ struct SettingsView: View {
     @Query private var transactions: [BudgetTransaction]
     @Query private var budgets: [Budget]
     
-<<<<<<< HEAD
-    // Remember to keep your specific App Group ID here!
+    // Remember to keep your specific App Group ID here for Widgets!
     @AppStorage("selectedCurrencyCode", store: UserDefaults(suiteName: "group.com.ariane.Financio"))
     private var selectedCurrencyCode = "USD"
     
+    // Controls the reset alert.
     @State private var isShowingResetAlert = false
     
     // NEW: We observe the Notification Manager
     @State private var notificationManager = NotificationManager.shared
     
-=======
-    @AppStorage("selectedCurrencyCode") private var selectedCurrencyCode = "USD"
-    
-    // Controls the reset alert.
-    @State private var isShowingResetAlert = false
-    
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
     var body: some View {
         NavigationStack {
             List {
@@ -55,7 +40,6 @@ struct SettingsView: View {
                     }
                 }
                 
-<<<<<<< HEAD
                 // The Notification Gate
                 Section("Notifications") {
                     HStack {
@@ -77,8 +61,6 @@ struct SettingsView: View {
                     }
                 }
                 
-=======
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
                 Section("Customization") {
                     NavigationLink {
                         CategoriesListView()
@@ -103,20 +85,8 @@ struct SettingsView: View {
             }
             .navigationTitle("Settings")
             .onAppear {
-<<<<<<< HEAD
                 // Check authorization status every time we open settings
                 notificationManager.checkAuthorizationStatus()
-            }
-            .alert("Reset All Data?", isPresented: $isShowingResetAlert) {
-                Button("Cancel", role: .cancel) { }
-                Button("Delete All Data", role: .destructive) {
-                    resetAllData()
-                }
-=======
-                DefaultCategorySeeder.seedCategoriesIfNeeded(
-                    in: modelContext,
-                    existingCategories: categories
-                )
             }
             .alert("Reset All Data?", isPresented: $isShowingResetAlert) {
                 
@@ -126,22 +96,20 @@ struct SettingsView: View {
                 // Destructive confirmation button.
                 Button("Delete All Data", role: .destructive) {
                     resetAllData()
+                    
+                    // Reseed default categories so the app isn't completely empty after a wipe!
+                    DefaultCategorySeeder.seedCategoriesIfNeeded(
+                        in: modelContext,
+                        existingCategories: categories
+                    )
                 }
                 
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
             } message: {
                 Text("This will permanently delete all accounts, categories, transactions, and budgets. This action cannot be undone.")
             }
         }
     }
     
-<<<<<<< HEAD
-    private func resetAllData() {
-        for transaction in transactions { modelContext.delete(transaction) }
-        for budget in budgets { modelContext.delete(budget) }
-        for category in categories { modelContext.delete(category) }
-        for account in accounts { modelContext.delete(account) }
-=======
     // Deletes all stored financial data from SwiftData.
     private func resetAllData() {
         // Delete transactions first because they reference accounts and categories.
@@ -163,7 +131,6 @@ struct SettingsView: View {
         for account in accounts {
             modelContext.delete(account)
         }
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
     }
 }
 

@@ -19,14 +19,11 @@ struct EditCategoryView: View {
     @State private var name: String
     @State private var selectedKind: CategoryKind
     @State private var iconName: String
-<<<<<<< HEAD
     
     // NEW: We use a Color object instead of a String
     @State private var selectedColor: Color
     @State private var showingIconPicker = false
-=======
     @State private var colorHex: String
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
     
     // Custom initializer to pre-fill the form.
     init(category: Category) {
@@ -34,13 +31,10 @@ struct EditCategoryView: View {
         _name = State(initialValue: category.name)
         _selectedKind = State(initialValue: category.kind)
         _iconName = State(initialValue: category.iconName)
-<<<<<<< HEAD
         
         // NEW: Translate the saved Hex string back into a SwiftUI Color so the wheel loads correctly!
         _selectedColor = State(initialValue: Color(hex: category.colorHex))
-=======
         _colorHex = State(initialValue: category.colorHex)
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
     }
     
     var body: some View {
@@ -55,7 +49,6 @@ struct EditCategoryView: View {
                         }
                     }
                     
-<<<<<<< HEAD
                     // Visual Icon Selector
                     HStack {
                         Text("Icon")
@@ -82,12 +75,10 @@ struct EditCategoryView: View {
                     
                     // NEW: Apple's native color wheel!
                     ColorPicker("Category Color", selection: $selectedColor, supportsOpacity: false)
-=======
                     TextField("Icon Name", text: $iconName)
                     
                     TextField("Color Hex", text: $colorHex)
                         .textInputAutocapitalization(.never)
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
                 }
             }
             .navigationTitle("Edit Category")
@@ -117,7 +108,6 @@ struct EditCategoryView: View {
     private func updateCategory() {
         guard isFormValid else { return }
         
-<<<<<<< HEAD
         // 1. Force Xcode to read the State variable as a raw Color object
         let safeColor: Color = selectedColor
         
@@ -130,12 +120,10 @@ struct EditCategoryView: View {
         
         // 3. Save the newly translated string
         category.colorHex = hexString
-=======
         category.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
         category.kind = selectedKind
         category.iconName = iconName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "tag" : iconName.trimmingCharacters(in: .whitespacesAndNewlines)
         category.colorHex = colorHex.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "#007AFF" : colorHex.trimmingCharacters(in: .whitespacesAndNewlines)
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
         
         dismiss()
     }

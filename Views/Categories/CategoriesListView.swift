@@ -31,8 +31,8 @@ struct CategoriesListView: View {
                 } else {
                     List {
                         ForEach(categories) { category in
-<<<<<<< HEAD
                             HStack(spacing: 16) {
+                                
                                 // NEW: The icon now uses your custom color!
                                 Image(systemName: category.iconName)
                                     .font(.title3)
@@ -41,12 +41,6 @@ struct CategoriesListView: View {
                                     // Use our Color+Hex extension to read the database color
                                     .background(Color(hex: category.colorHex).opacity(0.15))
                                     .clipShape(RoundedRectangle(cornerRadius: 8))
-=======
-                            HStack(spacing: 12) {
-                                Image(systemName: category.iconName)
-                                    .foregroundStyle(.blue)
-                                    .frame(width: 24)
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
                                 
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(category.name)

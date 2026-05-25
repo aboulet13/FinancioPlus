@@ -10,11 +10,8 @@ import SwiftData
 
 struct EditTransactionView: View {
     
-<<<<<<< HEAD
     // NEW: Needed for the SmartCategorizer to read past transactions
     @Environment(\.modelContext) private var modelContext
-=======
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
     @Environment(\.dismiss) private var dismiss
     
     // Fetch all accounts and categories from SwiftData.
@@ -26,11 +23,7 @@ struct EditTransactionView: View {
     
     // Form state initialized from the existing transaction.
     @State private var title: String
-<<<<<<< HEAD
     @State private var amount: Double?
-=======
-    @State private var amount: Double
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
     @State private var date: Date
     @State private var selectedType: TransactionType
     @State private var note: String
@@ -38,12 +31,9 @@ struct EditTransactionView: View {
     @State private var selectedToAccount: Account?
     @State private var selectedCategory: Category?
     
-<<<<<<< HEAD
     // NEW: Trigger for the inline Add Category sheet
     @State private var showingAddCategory = false
     
-=======
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
     // Custom initializer to pre-fill the form with the transaction's current values.
     init(transaction: BudgetTransaction) {
         self.transaction = transaction
@@ -60,9 +50,8 @@ struct EditTransactionView: View {
     var body: some View {
         NavigationStack {
             Form {
-<<<<<<< HEAD
-                
-                // NEW: Segmented control moved to the top, matching AddTransactionView
+
+                // Segmented control moved to the top, matching AddTransactionView
                 Picker("Transaction Type", selection: $selectedType) {
                     ForEach(TransactionType.allCases, id: \.self) { type in
                         Text(type.rawValue).tag(type)
@@ -84,16 +73,6 @@ struct EditTransactionView: View {
                         }
                     
                     // (Old Type picker removed from here)
-=======
-                Section("Transaction Details") {
-                    TextField("Title", text: $title)
-                    
-                    Picker("Type", selection: $selectedType) {
-                        ForEach(TransactionType.allCases, id: \.self) { type in
-                            Text(type.rawValue).tag(type)
-                        }
-                    }
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
                     
                     TextField("Amount", value: $amount, format: .number)
                         .keyboardType(.decimalPad)
@@ -108,11 +87,7 @@ struct EditTransactionView: View {
                         Text("Select an account").tag(Account?.none)
                         
                         ForEach(availableAccountsForSelection) { account in
-<<<<<<< HEAD
                             Text(accountDisplayName(account)).tag(account as Account?)
-=======
-                            Text(accountDisplayName(account)).tag(Optional(account))
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
                         }
                     }
                     
@@ -122,11 +97,7 @@ struct EditTransactionView: View {
                             Text("Select destination").tag(Account?.none)
                             
                             ForEach(availableToAccountsForSelection) { account in
-<<<<<<< HEAD
                                 Text(accountDisplayName(account)).tag(account as Account?)
-=======
-                                Text(accountDisplayName(account)).tag(Optional(account))
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
                             }
                         }
                     }
@@ -135,7 +106,6 @@ struct EditTransactionView: View {
                 // Only show category picker for income and expense.
                 if selectedType != .transfer {
                     Section("Category") {
-<<<<<<< HEAD
                         HStack {
                             Picker("Category", selection: $selectedCategory) {
                                 Text("Select a category").tag(Category?.none)
@@ -161,14 +131,6 @@ struct EditTransactionView: View {
                             }
                             // CRITICAL: Prevents the whole row from acting as a button!
                             .buttonStyle(.borderless)
-=======
-                        Picker("Category", selection: $selectedCategory) {
-                            Text("Select a category").tag(Category?.none)
-                            
-                            ForEach(filteredCategories) { category in
-                                Text(category.name).tag(Optional(category))
-                            }
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
                         }
                     }
                 }
@@ -191,37 +153,28 @@ struct EditTransactionView: View {
             .onChange(of: selectedType) { _, newType in
                 switch newType {
                 case .income:
-<<<<<<< HEAD
-                    selectedToAccount = nil
-=======
                     // Income does not use a destination account.
                     selectedToAccount = nil
                     
                     // Clear the category if it is not a valid income category.
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
                     if selectedCategory?.kind != CategoryKind.income {
                         selectedCategory = nil
                     }
                     
                 case .expense:
-<<<<<<< HEAD
-                    selectedToAccount = nil
-=======
                     // Expense does not use a destination account.
                     selectedToAccount = nil
                     
                     // Clear the category if it is not a valid expense category.
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
                     if selectedCategory?.kind != CategoryKind.expense {
                         selectedCategory = nil
                     }
                     
                 case .transfer:
-<<<<<<< HEAD
                     selectedCategory = nil
                 }
             }
-            // NEW: Tells the category sheet what type of category to default to
+            // Tells the category sheet what type of category to default to
             .sheet(isPresented: $showingAddCategory) {
                 let defaultKind: CategoryKind = (selectedType == .income) ? .income : .expense
                 
@@ -234,17 +187,8 @@ struct EditTransactionView: View {
     
     // MARK: - Logic & Helpers
     
-=======
-                    // Transfers do not use categories.
-                    selectedCategory = nil
-                }
-            }
-        }
-    }
-    
     // Main account picker options:
     // all active accounts, plus the currently selected one if it is archived.
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
     private var availableAccountsForSelection: [Account] {
         var result = accounts.filter { account in
             account.isArchived == false
@@ -263,11 +207,8 @@ struct EditTransactionView: View {
         }
     }
     
-<<<<<<< HEAD
-=======
     // Destination account picker options:
     // all active accounts, plus the currently selected destination account if it is archived.
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
     private var availableToAccountsForSelection: [Account] {
         var result = accounts.filter { account in
             account.isArchived == false
@@ -286,11 +227,8 @@ struct EditTransactionView: View {
         }
     }
     
-<<<<<<< HEAD
-=======
     // Filters categories so the user only sees categories
     // matching the chosen transaction type.
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
     private var filteredCategories: [Category] {
         switch selectedType {
         case .income:
@@ -306,18 +244,11 @@ struct EditTransactionView: View {
         }
     }
     
-<<<<<<< HEAD
-    private var isFormValid: Bool {
-        let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        guard !trimmedTitle.isEmpty, (amount ?? 0) > 0, selectedAccount != nil else {
-=======
     // Basic validation for the form.
     private var isFormValid: Bool {
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        guard !trimmedTitle.isEmpty, amount > 0, selectedAccount != nil else {
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
+        guard !trimmedTitle.isEmpty, (amount ?? 0) > 0, selectedAccount != nil else {
             return false
         }
         
@@ -334,10 +265,7 @@ struct EditTransactionView: View {
         }
     }
     
-<<<<<<< HEAD
-=======
     // Adds a label for archived accounts when they appear in edit pickers.
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
     private func accountDisplayName(_ account: Account) -> String {
         if account.isArchived {
             return "\(account.name) (Archived)"
@@ -346,11 +274,8 @@ struct EditTransactionView: View {
         }
     }
     
-<<<<<<< HEAD
-=======
     // Updates the transaction by reversing the old balance effects,
     // changing the stored values, then applying the new effects.
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
     private func updateTransaction() {
         guard isFormValid else { return }
         
@@ -359,11 +284,7 @@ struct EditTransactionView: View {
         
         // Step 2: Update the transaction's stored properties.
         transaction.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
-<<<<<<< HEAD
         transaction.amount = amount ?? 0
-=======
-        transaction.amount = amount
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
         transaction.date = date
         transaction.type = selectedType
         transaction.note = note.trimmingCharacters(in: .whitespacesAndNewlines)

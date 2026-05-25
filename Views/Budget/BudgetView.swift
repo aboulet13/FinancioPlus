@@ -17,7 +17,6 @@ struct BudgetView: View {
     
     @State private var isShowingAddBudget = false
     @State private var selectedBudget: Budget?
-<<<<<<< HEAD
     @State private var budgetPendingDeletion: Budget?
     
     // UI State: Tracks which month the user is currently looking at.
@@ -35,23 +34,11 @@ struct BudgetView: View {
         )
     }
     
-=======
-    
-    // Stores the budget the user is about to delete.
-    @State private var budgetPendingDeletion: Budget?
-    
-    @State private var selectedMonth = Calendar.current.component(.month, from: Date())
-    @State private var selectedYear = Calendar.current.component(.year, from: Date())
-    
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 
-<<<<<<< HEAD
                 // Month Navigation Header
-=======
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
                 HStack {
                     Button {
                         goToPreviousMonth()
@@ -61,11 +48,7 @@ struct BudgetView: View {
                     
                     Spacer()
                     
-<<<<<<< HEAD
-                    Text(viewModel.monthYearTitle) // Pulled from ViewModel
-=======
-                    Text(monthYearTitle)
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
+                    Text(viewModel.monthYearTitle) // Purely driven by ViewModel
                         .font(.headline)
                     
                     Spacer()
@@ -79,11 +62,7 @@ struct BudgetView: View {
                 .padding()
                 
                 Group {
-<<<<<<< HEAD
-                    if viewModel.selectedMonthBudgets.isEmpty { // Pulled from ViewModel
-=======
-                    if selectedMonthBudgets.isEmpty {
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
+                    if viewModel.selectedMonthBudgets.isEmpty {
                         ContentUnavailableView(
                             "No Budgets Yet",
                             systemImage: "chart.pie",
@@ -91,11 +70,7 @@ struct BudgetView: View {
                         )
                     } else {
                         List {
-<<<<<<< HEAD
                             ForEach(viewModel.selectedMonthBudgets) { budget in
-=======
-                            ForEach(selectedMonthBudgets) { budget in
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
                                 VStack(alignment: .leading, spacing: 10) {
                                     
                                     Text(budget.category?.name ?? "Unknown Category")
@@ -116,11 +91,7 @@ struct BudgetView: View {
                                             Text("Spent")
                                                 .font(.caption)
                                                 .foregroundStyle(.secondary)
-<<<<<<< HEAD
-                                            MoneyText(amount: viewModel.spentAmount(for: budget)) // ViewModel
-=======
-                                            MoneyText(amount: spentAmount(for: budget))
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
+                                            MoneyText(amount: viewModel.spentAmount(for: budget))
                                                 .font(.subheadline)
                                                 .foregroundStyle(.red)
                                         }
@@ -131,32 +102,18 @@ struct BudgetView: View {
                                             Text("Remaining")
                                                 .font(.caption)
                                                 .foregroundStyle(.secondary)
-<<<<<<< HEAD
-                                            MoneyText(amount: viewModel.remainingAmount(for: budget)) // ViewModel
+                                            MoneyText(amount: viewModel.remainingAmount(for: budget))
                                                 .font(.subheadline)
                                                 .bold()
                                                 .foregroundStyle(viewModel.remainingAmount(for: budget) >= 0 ? .green : .red)
-=======
-                                            MoneyText(amount: remainingAmount(for: budget))
-                                                .font(.subheadline)
-                                                .bold()
-                                                .foregroundStyle(remainingAmount(for: budget) >= 0 ? .green : .red)
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
                                         }
                                     }
                                     
                                     VStack(alignment: .leading, spacing: 6) {
-<<<<<<< HEAD
-                                        ProgressView(value: viewModel.progressValue(for: budget)) // ViewModel
-                                            .tint(viewModel.progressColor(for: budget)) // ViewModel
+                                        ProgressView(value: viewModel.progressValue(for: budget))
+                                            .tint(viewModel.progressColor(for: budget))
                                         
-                                        Text(viewModel.progressText(for: budget)) // ViewModel
-=======
-                                        ProgressView(value: progressValue(for: budget))
-                                            .tint(progressColor(for: budget))
-                                        
-                                        Text(progressText(for: budget))
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
+                                        Text(viewModel.progressText(for: budget))
                                             .font(.caption)
                                             .foregroundStyle(.secondary)
                                     }
@@ -212,10 +169,7 @@ struct BudgetView: View {
                         self.budgetPendingDeletion = nil
                     }
                 }
-<<<<<<< HEAD
-=======
                 
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
                 Button("Cancel", role: .cancel) {
                     budgetPendingDeletion = nil
                 }
@@ -225,74 +179,7 @@ struct BudgetView: View {
         }
     }
     
-<<<<<<< HEAD
     // UI State modification stays in the View layer
-=======
-    private var selectedMonthBudgets: [Budget] {
-        budgets.filter { budget in
-            budget.month == selectedMonth && budget.year == selectedYear
-        }
-    }
-    
-    private var monthYearTitle: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "LLLL yyyy"
-        
-        var components = DateComponents()
-        components.month = selectedMonth
-        components.year = selectedYear
-        
-        let calendar = Calendar.current
-        let date = calendar.date(from: components) ?? Date()
-        
-        return formatter.string(from: date)
-    }
-    
-    private func spentAmount(for budget: Budget) -> Double {
-        guard let category = budget.category else { return 0 }
-        
-        return transactions
-            .filter { transaction in
-                transaction.type == .expense &&
-                transaction.category?.id == category.id &&
-                isInSelectedMonth(transaction.date)
-            }
-            .reduce(0) { partialResult, transaction in
-                partialResult + transaction.amount
-            }
-    }
-    
-    private func remainingAmount(for budget: Budget) -> Double {
-        budget.plannedAmount - spentAmount(for: budget)
-    }
-    
-    private func progressValue(for budget: Budget) -> Double {
-        guard budget.plannedAmount > 0 else { return 0 }
-        
-        let ratio = spentAmount(for: budget) / budget.plannedAmount
-        return min(ratio, 1.0)
-    }
-    
-    private func progressText(for budget: Budget) -> String {
-        guard budget.plannedAmount > 0 else { return "No budget set" }
-        
-        let percentage = (spentAmount(for: budget) / budget.plannedAmount) * 100
-        return String(format: "%.0f%% of budget used", percentage)
-    }
-    
-    private func progressColor(for budget: Budget) -> Color {
-        remainingAmount(for: budget) >= 0 ? .blue : .red
-    }
-    
-    private func isInSelectedMonth(_ date: Date) -> Bool {
-        let calendar = Calendar.current
-        let month = calendar.component(.month, from: date)
-        let year = calendar.component(.year, from: date)
-        
-        return month == selectedMonth && year == selectedYear
-    }
-    
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
     private func goToPreviousMonth() {
         if selectedMonth == 1 {
             selectedMonth = 12

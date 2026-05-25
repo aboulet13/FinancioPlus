@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct MainTabView: View {
-<<<<<<< HEAD
     
     // Tap into the global manager
     @Environment(SheetManager.self) private var sheetManager
@@ -22,8 +21,6 @@ struct MainTabView: View {
         )
     }
     
-=======
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
     var body: some View {
         TabView {
             
@@ -52,7 +49,6 @@ struct MainTabView: View {
                     Label("Settings", systemImage: "gearshape")
                 }
         }
-<<<<<<< HEAD
         
         // THE CENTRALIZED ROUTER
         // Whenever sheetManager.activeSheet changes, this single block of code handles it!
@@ -70,8 +66,6 @@ struct MainTabView: View {
                 Text("Add Recurring View Goes Here") // Replace with your actual view
             }
         }
-=======
->>>>>>> 74d97b81f555e56974bd3e08d497b3cb8eab8b38
     }
 }
 

@@ -19,10 +19,9 @@ struct DashboardView: View {
     @Query(sort: \BudgetTransaction.date, order: .reverse) private var transactions: [BudgetTransaction]
     
     // 2. INJECT INTO VIEWMODEL
-    // We treat this struct as a pure data transformer to parse mathematical queries cleanly
-    private var viewModel: DashboardViewModel {
-        DashboardViewModel(accounts: accounts, transactions: transactions)
-    }
+    // We use @State here because DashboardViewModel is now an @Observable class.
+    // This allows the view to own the model and react to its calculated properties.
+    @State private var viewModel = DashboardViewModel()
     
     var body: some View {
         NavigationStack {
@@ -33,13 +32,16 @@ struct DashboardView: View {
                     // 1. HERO SECTION: Net Worth / Total Balance
                     heroCard
                     
-                    // 2. CHART SECTION: Displays asset allocation distribution
+                    // 2. GRAPH SPACE: Scrollable Cards (Line & Donut)
+                    scrollableChartsSection
+                    
+                    // 3. CHART SECTION: Displays asset allocation distribution
                     assetAllocationCard
                     
-                    // 3. CASH FLOW SECTION
+                    // 4. CASH FLOW SECTION
                     cashFlowCard
                     
-                    // 4. ACTION CENTER: Savings & Reports
+                    // 5. ACTION CENTER: Savings & Reports
                     actionCenterCard
                     
                 }
@@ -53,10 +55,123 @@ struct DashboardView: View {
                     QuickAddMenu() // Instant global shortcut insertion panel
                 }
             }
+            // Update the ViewModel when the View first loads
+            .onAppear {
+                viewModel.accounts = accounts
+                viewModel.transactions = transactions
+            }
+            // Keep the ViewModel in sync if SwiftData changes the accounts array
+            .onChange(of: accounts) { _, newAccounts in
+                viewModel.accounts = newAccounts
+            }
+            // Keep the ViewModel in sync if SwiftData changes the transactions array
+            .onChange(of: transactions) { _, newTransactions in
+                viewModel.transactions = newTransactions
+            }
         }
     }
     
     // MARK: - UI Components
+    
+    // The sideways scrollable section for our current month insights
+    private var scrollableChartsSection: some View {
+        TabView {
+            // CARD 1: Line Graph for Daily Spending
+            ChartCard(title: "Daily Spending (This Month)") {
+                if viewModel.dailySpendingsData.isEmpty {
+                    Text("No spending data yet.")
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    Chart(viewModel.dailySpendingsData) { item in
+                        LineMark(
+                            x: .value("Day", item.date, unit: .day),
+                            y: .value("Amount", item.amount)
+                        )
+                        .interpolationMethod(.monotone) // Smooth curved line
+                        .foregroundStyle(.blue)
+                        
+                        AreaMark(
+                            x: .value("Day", item.date, unit: .day),
+                            y: .value("Amount", item.amount)
+                        )
+                        .interpolationMethod(.monotone)
+                        .foregroundStyle(
+                            .linearGradient(
+                                colors: [.blue.opacity(0.4), .clear],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                    }
+                    .chartXAxis {
+                        AxisMarks(values: .stride(by: .day)) { value in
+                            if let date = value.as(Date.self) {
+                                let day = Calendar.current.component(.day, from: date)
+                                // Only show labels for the 1st or every 5th day to keep it clean
+                                if day % 5 == 0 || day == 1 {
+                                    AxisValueLabel(format: .dateTime.day())
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // CARD 2: Donut Graph for Category Spending
+            ChartCard(title: "Spending by Category") {
+                if viewModel.spendingByCategoryData.isEmpty {
+                    Text("No expenses yet this month.")
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    Chart(viewModel.spendingByCategoryData) { item in
+                        SectorMark(
+                            angle: .value("Amount", item.amount),
+                            innerRadius: .ratio(0.6), // Creates the donut hole
+                            angularInset: 1.5 // Visual spacing between slices
+                        )
+                        .foregroundStyle(by: .value("Category", item.categoryName))
+                    }
+                }
+            }
+        }
+        // Native iOS pagination
+        .tabViewStyle(.page(indexDisplayMode: .always))
+        // Fixed height to look like a sturdy widget
+        .frame(height: 380)
+        // Offset negative padding to counteract TabView's default dot spacing
+        .padding(.bottom, -16)
+    }
+
+    // A reusable UI component ensuring all swipeable charts look like identical cards
+    private struct ChartCard<Content: View>: View {
+        let title: String
+        let content: Content
+        
+        init(title: String, @ViewBuilder content: () -> Content) {
+            self.title = title
+            self.content = content()
+        }
+        
+        var body: some View {
+            VStack(alignment: .leading, spacing: 16) {
+                Text(title)
+                    .font(.headline)
+                
+                content
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .padding(20)
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
+            // Pushes the card up slightly so the TabView dots rest outside the white card area
+            .padding(.bottom, 40)
+            // Ensures the shadow doesn't get clipped by the TabView frame
+            .padding(.horizontal, 4)
+        }
+    }
     
     // Upgraded Asset Allocation Card utilizing optimized SectorMark signatures
     private var assetAllocationCard: some View {

@@ -7,15 +7,38 @@
 
 import Foundation
 import SwiftUI
+import Observation // Added to support @Observable
 
-// We use a struct for the ViewModel here because it acts as a "Data Transformer".
+// 1. Simple Data Models for our Charts
+// We use 'Identifiable' so Swift Charts can iterate over them easily.
+struct DailySpending: Identifiable {
+    let id = UUID()
+    let date: Date
+    let day: Int
+    let amount: Double
+}
+
+struct CategorySpending: Identifiable {
+    let id = UUID()
+    let categoryName: String
+    let amount: Double
+}
+
+// We use an @Observable class (previously a struct) for the ViewModel here because it acts as a "Data Transformer".
 // It takes the raw data from SwiftData and calculates all our business logic metrics.
-struct DashboardViewModel {
+@Observable
+class DashboardViewModel {
     
     // 1. THE RAW INGREDIENTS
     // The View will pass these arrays in whenever the SwiftData @Query updates.
-    let accounts: [Account]
-    let transactions: [BudgetTransaction]
+    var accounts: [Account]
+    var transactions: [BudgetTransaction]
+    
+    // Added an initializer since classes require one for their properties.
+    init(accounts: [Account] = [], transactions: [BudgetTransaction] = []) {
+        self.accounts = accounts
+        self.transactions = transactions
+    }
     
     // 2. THE CALCULATED METRICS
     // We moved all the logic from the View into these computed properties.
@@ -96,8 +119,42 @@ struct DashboardViewModel {
         Array(transactions.prefix(5))
     }
     
-    // Builds chart data showing expense totals by category for the current month.
-    var spendingByCategoryData: [(categoryName: String, amount: Double)] {
+    // MARK: - Scrollable Charts Data Transformers
+    
+    // Builds chart data showing daily spending totals for the current month (For the Line Graph).
+    var dailySpendingsData: [DailySpending] {
+        let calendar = Calendar.current
+        let now = Date()
+        
+        guard let currentMonthInterval = calendar.dateInterval(of: .month, for: now),
+              let daysRange = calendar.range(of: .day, in: .month, for: now) else {
+            return []
+        }
+        
+        let currentMonthExpenses = transactions.filter { transaction in
+            transaction.type == .expense && currentMonthInterval.contains(transaction.date)
+        }
+        
+        var tempDailyStats: [DailySpending] = []
+        
+        for day in daysRange {
+            var components = calendar.dateComponents([.year, .month], from: now)
+            components.day = day
+            
+            if let specificDate = calendar.date(from: components) {
+                let expensesOnThisDay = currentMonthExpenses.filter {
+                    calendar.isDate($0.date, inSameDayAs: specificDate)
+                }
+                
+                let totalForDay = expensesOnThisDay.reduce(0.0) { $0 + $1.amount }
+                tempDailyStats.append(DailySpending(date: specificDate, day: day, amount: totalForDay))
+            }
+        }
+        return tempDailyStats
+    }
+    
+    // Builds chart data showing expense totals by category for the current month (For the Donut Graph).
+    var spendingByCategoryData: [CategorySpending] {
         let expenseTransactions = transactions.filter { transaction in
             transaction.type == .expense &&
             isInCurrentMonth(transaction.date) &&
@@ -113,7 +170,7 @@ struct DashboardViewModel {
         
         return totalsByCategory
             .map { entry in
-                (categoryName: entry.key, amount: entry.value)
+                CategorySpending(categoryName: entry.key, amount: entry.value)
             }
             .sorted { first, second in
                 first.amount > second.amount

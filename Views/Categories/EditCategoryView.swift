@@ -20,10 +20,9 @@ struct EditCategoryView: View {
     @State private var selectedKind: CategoryKind
     @State private var iconName: String
     
-    // NEW: We use a Color object instead of a String
+    // We use a Color object instead of a String
     @State private var selectedColor: Color
     @State private var showingIconPicker = false
-    @State private var colorHex: String
     
     // Custom initializer to pre-fill the form.
     init(category: Category) {
@@ -32,9 +31,8 @@ struct EditCategoryView: View {
         _selectedKind = State(initialValue: category.kind)
         _iconName = State(initialValue: category.iconName)
         
-        // NEW: Translate the saved Hex string back into a SwiftUI Color so the wheel loads correctly!
+        // Translate the saved Hex string back into a SwiftUI Color so the wheel loads correctly!
         _selectedColor = State(initialValue: Color(hex: category.colorHex))
-        _colorHex = State(initialValue: category.colorHex)
     }
     
     var body: some View {
@@ -59,8 +57,8 @@ struct EditCategoryView: View {
                             .font(.title3)
                             .foregroundStyle(selectedColor)
                             .padding(8)
-                            // NEW: The icon preview now updates dynamically to match the color wheel!
-                            .background(Color(selectedColor).opacity(0.15))
+                            // The icon preview now updates dynamically to match the color wheel!
+                            .background(selectedColor.opacity(0.15))
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                     .contentShape(Rectangle()) // Makes the whole row tappable, not just the text
@@ -73,12 +71,10 @@ struct EditCategoryView: View {
                             .presentationDetents([.medium, .large]) // Makes it a nice half-sheet
                     }
                     
-                    // NEW: Apple's native color wheel!
+                    // Apple's native color wheel!
                     ColorPicker("Category Color", selection: $selectedColor, supportsOpacity: false)
-                    TextField("Icon Name", text: $iconName)
                     
-                    TextField("Color Hex", text: $colorHex)
-                        .textInputAutocapitalization(.never)
+                    // REMOVED: TextFields for Icon Name and Color Hex have been completely removed!
                 }
             }
             .navigationTitle("Edit Category")
@@ -114,16 +110,11 @@ struct EditCategoryView: View {
         // 2. Call the custom extension to translate it back to a database string
         let hexString = safeColor.toHex() ?? "#007AFF"
         
+        // 3. Save the newly updated values to the live database object
         category.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
         category.kind = selectedKind
         category.iconName = iconName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "tag" : iconName.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        // 3. Save the newly translated string
         category.colorHex = hexString
-        category.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        category.kind = selectedKind
-        category.iconName = iconName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "tag" : iconName.trimmingCharacters(in: .whitespacesAndNewlines)
-        category.colorHex = colorHex.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "#007AFF" : colorHex.trimmingCharacters(in: .whitespacesAndNewlines)
         
         dismiss()
     }

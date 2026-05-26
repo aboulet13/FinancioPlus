@@ -15,7 +15,7 @@ struct AccountsListView: View {
     // 1. FETCH RAW DATA
     @Query(sort: \Account.name) private var accounts: [Account]
     
-    // NEW: Fetch our account groups
+    // Fetch our account groups
     @Query(sort: \AccountGroup.name) private var accountGroups: [AccountGroup]
     
     @State private var isShowingAddAccount = false
@@ -23,6 +23,9 @@ struct AccountsListView: View {
     
     // Stores the account the user is about to archive.
     @State private var accountPendingArchive: Account?
+    
+    // Stores the account the user is about to permanently delete.
+    @State private var accountPendingDelete: Account?
     
     // 2. INJECT INTO VIEW MODEL
     private var viewModel: AccountsViewModel {
@@ -55,8 +58,8 @@ struct AccountsListView: View {
                                 Section {
                                     ForEach(groupAccounts) { account in
                                         accountRow(for: account)
-                                            .swipeActions {
-                                                archiveSwipeButton(for: account)
+                                            .swipeActions(edge: .trailing) {
+                                                activeSwipeActions(for: account)
                                             }
                                     }
                                 } header: {
@@ -84,8 +87,8 @@ struct AccountsListView: View {
                             Section {
                                 ForEach(ungroupedActiveAccounts) { account in
                                     accountRow(for: account)
-                                        .swipeActions {
-                                            archiveSwipeButton(for: account)
+                                        .swipeActions(edge: .trailing) {
+                                            activeSwipeActions(for: account)
                                         }
                                 }
                             } header: {
@@ -102,13 +105,8 @@ struct AccountsListView: View {
                             Section("Archived Accounts") {
                                 ForEach(viewModel.archivedAccounts) { account in
                                     accountRow(for: account)
-                                        .swipeActions {
-                                            Button {
-                                                unarchiveAccount(account)
-                                            } label: {
-                                                Label("Unarchive", systemImage: "arrow.uturn.backward")
-                                            }
-                                            .tint(.blue)
+                                        .swipeActions(edge: .trailing) {
+                                            archivedSwipeActions(for: account)
                                         }
                                 }
                             }
@@ -132,6 +130,8 @@ struct AccountsListView: View {
             .sheet(item: $selectedAccount) { account in
                 EditAccountView(account: account)
             }
+            // MARK: - Confirmation Dialogs
+            // ARCHIVE DIALOG
             .confirmationDialog(
                 "Archive this account?",
                 isPresented: Binding(
@@ -157,21 +157,75 @@ struct AccountsListView: View {
             } message: {
                 Text("Archived accounts are hidden from active lists, excluded from total balance, and unavailable for new transactions.")
             }
+            // DELETE DIALOG
+            .confirmationDialog(
+                "Permanently delete this account?",
+                isPresented: Binding(
+                    get: { accountPendingDelete != nil },
+                    set: { newValue in
+                        if newValue == false {
+                            accountPendingDelete = nil
+                        }
+                    }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Delete Account", role: .destructive) {
+                    if let accountPendingDelete {
+                        deleteAccount(accountPendingDelete)
+                        self.accountPendingDelete = nil
+                    }
+                }
+                
+                Button("Cancel", role: .cancel) {
+                    accountPendingDelete = nil
+                }
+            } message: {
+                Text("Deleting this account will permanently remove it from your database. This action cannot be undone.")
+            }
         }
     }
     
     // MARK: - UI Components
     
-    // Extracted the archive swipe button to avoid repeating code in the groups
+    // Extracted swipe actions for Active accounts
     @ViewBuilder
-    private func archiveSwipeButton(for account: Account) -> some View {
+    private func activeSwipeActions(for account: Account) -> some View {
+        // 1st Button (Outermost / Full-Swipe action): Archive
         Button {
-            // Ask for confirmation before archiving.
             accountPendingArchive = account
         } label: {
             Label("Archive", systemImage: "archivebox")
         }
         .tint(.orange)
+        
+        // 2nd Button (Innermost): Delete
+        Button(role: .destructive) {
+            accountPendingDelete = account
+        } label: {
+            Label("Delete", systemImage: "trash")
+        }
+        .tint(.red) // Explicitly forcing the red color
+    }
+    
+    // Extracted swipe actions for Archived accounts
+    @ViewBuilder
+    private func archivedSwipeActions(for account: Account) -> some View {
+        // 1st Button (Outermost / Full-Swipe action): Unarchive
+        Button {
+            unarchiveAccount(account)
+        } label: {
+            Label("Unarchive", systemImage: "arrow.uturn.backward")
+        }
+        .tint(.blue)
+        
+        // 2nd Button (Innermost): Delete
+        Button(role: .destructive) {
+            accountPendingDelete = account
+        } label: {
+            Label("Delete", systemImage: "trash")
+        }
+        .tint(.red) // Explicitly forcing the red color
     }
     
     // Reusable row view for an account.
@@ -200,14 +254,16 @@ struct AccountsListView: View {
     
     // MARK: - UI Interactions that modify the database
     
-    // Marks an account as archived.
     private func archiveAccount(_ account: Account) {
         account.isArchived = true
     }
     
-    // Marks an account as active again.
     private func unarchiveAccount(_ account: Account) {
         account.isArchived = false
+    }
+    
+    private func deleteAccount(_ account: Account) {
+        modelContext.delete(account)
     }
 }
 

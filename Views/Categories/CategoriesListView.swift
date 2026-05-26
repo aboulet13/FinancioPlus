@@ -19,6 +19,9 @@ struct CategoriesListView: View {
     // Stores the category currently selected for editing.
     @State private var selectedCategory: Category?
     
+    // NEW: Stores the category the user is about to permanently delete.
+    @State private var categoryPendingDelete: Category?
+    
     var body: some View {
         NavigationStack {
             Group {
@@ -56,6 +59,14 @@ struct CategoriesListView: View {
                             .onTapGesture {
                                 selectedCategory = category
                             }
+                            // NEW: Swipe to delete action
+                            .swipeActions(edge: .trailing) {
+                                Button(role: .destructive) {
+                                    categoryPendingDelete = category
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
                         }
                     }
                 }
@@ -76,7 +87,38 @@ struct CategoriesListView: View {
             .sheet(item: $selectedCategory) { category in
                 EditCategoryView(category: category)
             }
+            // NEW: Delete Confirmation Dialog
+            .confirmationDialog(
+                "Permanently delete this category?",
+                isPresented: Binding(
+                    get: { categoryPendingDelete != nil },
+                    set: { newValue in
+                        if newValue == false {
+                            categoryPendingDelete = nil
+                        }
+                    }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Delete Category", role: .destructive) {
+                    if let categoryPendingDelete {
+                        deleteCategory(categoryPendingDelete)
+                        self.categoryPendingDelete = nil
+                    }
+                }
+                
+                Button("Cancel", role: .cancel) {
+                    categoryPendingDelete = nil
+                }
+            } message: {
+                Text("Deleting this category will remove it permanently. Any past transactions tied to this category will lose their categorization.")
+            }
         }
+    }
+    
+    // NEW: Deletes the category from the SwiftData context.
+    private func deleteCategory(_ category: Category) {
+        modelContext.delete(category)
     }
 }
 

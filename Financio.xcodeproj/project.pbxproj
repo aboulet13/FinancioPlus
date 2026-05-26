@@ -73,6 +73,7 @@
 		D6CDCC55985952AB8F95BF84 /* DefaultCategorySeeder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43448F65392FE42BF2348655 /* DefaultCategorySeeder.swift */; };
 		D986DE995282BBD2DBA42AA9 /* SavingsGoalsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19704CD6A685013933740DEA /* SavingsGoalsListView.swift */; };
 		DA50CCAF2FC57F2300CAFD7A /* AccountGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA50CCAE2FC57F1D00CAFD7A /* AccountGroup.swift */; };
+		DA50CCB12FC6312C00CAFD7A /* EditRecurringTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA50CCB02FC6312B00CAFD7A /* EditRecurringTransactionView.swift */; };
 		E44090CBFBF36A3775AEAA35 /* AddCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0812F3A10254C0008EB6D2B7 /* AddCategoryView.swift */; };
 		ECAA7A444E1086F4210915BA /* AddTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE2374204666E0DBDDF9A7B5 /* AddTransactionView.swift */; };
 		ED67C4C5D545665DFBAA5341 /* fsmonitor-watchman.sample in Resources */ = {isa = PBXBuildFile; fileRef = F798CC1F4834D72DAA7D4E97 /* fsmonitor-watchman.sample */; };
@@ -259,6 +260,7 @@
 		D72BB05509E6BF58887F1084 /* FETCH_HEAD */ = {isa = PBXFileReference; lastKnownFileType = text; path = FETCH_HEAD; sourceTree = "<group>"; };
 		D9B4A05431BBCC80E88D4656 /* a77a8f90d5b97bc4519c1331128966f8ba15d7 */ = {isa = PBXFileReference; lastKnownFileType = file; path = a77a8f90d5b97bc4519c1331128966f8ba15d7; sourceTree = "<group>"; };
 		DA50CCAE2FC57F1D00CAFD7A /* AccountGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountGroup.swift; sourceTree = "<group>"; };
+		DA50CCB02FC6312B00CAFD7A /* EditRecurringTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditRecurringTransactionView.swift; sourceTree = "<group>"; };
 		DB2B6089EE1CB3476C5EF2B3 /* SavingsGoals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsGoals.swift; sourceTree = "<group>"; };
 		DC563999A351F2C9D1787F50 /* TransactionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsViewModel.swift; sourceTree = "<group>"; };
 		DE214DB3C250B0F1C31074C1 /* 00dc0c2d05e45d7f256fdceab6f58cfbdadf11 */ = {isa = PBXFileReference; lastKnownFileType = file; path = 00dc0c2d05e45d7f256fdceab6f58cfbdadf11; sourceTree = "<group>"; };
@@ -1486,6 +1488,7 @@
 		EB1E88F5B0CEB5843C157940 /* RecurringTransactions */ = {
 			isa = PBXGroup;
 			children = (
+				DA50CCB02FC6312B00CAFD7A /* EditRecurringTransactionView.swift */,
 				E1D14AD0C03265344E53381B /* AddRecurringTransactionView.swift */,
 				E35F3DA8C587B004F30DC8D7 /* RecurringTransactionsListView.swift */,
 			);
@@ -1708,6 +1711,7 @@
 				C28FB0E80263C1E41553AA91 /* NetWorthChartView.swift in Sources */,
 				8FC95705D80B0F18CC79211F /* NetWorthSnapshot.swift in Sources */,
 				F09B8254F961D695DD236A7F /* NotificationManager.swift in Sources */,
+				DA50CCB12FC6312C00CAFD7A /* EditRecurringTransactionView.swift in Sources */,
 				4A7B7E4A76DF0F9433BE3DD4 /* OnboardingView.swift in Sources */,
 				D18478184A8BFA380AEE6110 /* QuickAddMenu.swift in Sources */,
 				9C78840713EB60FAA6BF44CB /* RecurringTransaction.swift in Sources */,

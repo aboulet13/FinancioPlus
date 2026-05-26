@@ -17,6 +17,9 @@ struct RecurringTransactionsListView: View {
     
     @State private var isShowingAddRecurringTransaction = false
     
+    // NEW: Stores the recurring rule currently selected for editing.
+    @State private var selectedRecurringTransaction: RecurringTransaction?
+    
     // Stores the recurring rule the user is about to delete.
     @State private var recurringPendingDeletion: RecurringTransaction?
     
@@ -81,6 +84,11 @@ struct RecurringTransactionsListView: View {
                                 }
                             }
                             .padding(.vertical, 6)
+                            // NEW: Make the entire row tappable (even the empty spaces)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                selectedRecurringTransaction = recurring
+                            }
                             .swipeActions {
                                 Button(role: .destructive) {
                                     recurringPendingDeletion = recurring
@@ -104,6 +112,10 @@ struct RecurringTransactionsListView: View {
             }
             .sheet(isPresented: $isShowingAddRecurringTransaction) {
                 AddRecurringTransactionView()
+            }
+            // NEW: The sheet that pops up when a user taps a transaction row
+            .sheet(item: $selectedRecurringTransaction) { recurring in
+                EditRecurringTransactionView(recurringTransaction: recurring)
             }
             .confirmationDialog(
                 "Delete this recurring rule?",

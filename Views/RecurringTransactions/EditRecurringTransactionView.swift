@@ -1,31 +1,46 @@
 //
-//  AddRecurringTransactionView.swift
+//  EditRecurringTransactionView.swift
 //  Financio
 //
-//  Created by Ariane Boulet on 13/04/2026.
+//  Created by Ariane on 26/05/2026.
 //
 
 import SwiftUI
 import SwiftData
 
-struct AddRecurringTransactionView: View {
+struct EditRecurringTransactionView: View {
     
-    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
     @Query(sort: \Account.name) private var accounts: [Account]
     @Query(sort: \Category.name) private var categories: [Category]
     
-    @State private var title = ""
-    @State private var amount = 0.0
-    @State private var selectedType: TransactionType = .expense
-    @State private var selectedFrequency: RecurringFrequency = .monthly
-    @State private var nextDate = Date()
-    @State private var note = ""
+    let recurringTransaction: RecurringTransaction
+    
+    @State private var title: String
+    @State private var amount: Double
+    @State private var selectedType: TransactionType
+    @State private var selectedFrequency: RecurringFrequency
+    @State private var nextDate: Date
+    @State private var note: String
     @State private var selectedAccount: Account?
     @State private var selectedToAccount: Account?
     @State private var selectedCategory: Category?
-    @State private var isActive = true
+    @State private var isActive: Bool
+    
+    init(recurringTransaction: RecurringTransaction) {
+        self.recurringTransaction = recurringTransaction
+        _title = State(initialValue: recurringTransaction.title)
+        _amount = State(initialValue: recurringTransaction.amount)
+        _selectedType = State(initialValue: recurringTransaction.type)
+        _selectedFrequency = State(initialValue: recurringTransaction.frequency)
+        _nextDate = State(initialValue: recurringTransaction.nextDate)
+        _note = State(initialValue: recurringTransaction.note ?? "")
+        _selectedAccount = State(initialValue: recurringTransaction.account)
+        _selectedToAccount = State(initialValue: recurringTransaction.toAccount)
+        _selectedCategory = State(initialValue: recurringTransaction.category)
+        _isActive = State(initialValue: recurringTransaction.isActive)
+    }
     
     var body: some View {
         NavigationStack {
@@ -56,10 +71,8 @@ struct AddRecurringTransactionView: View {
                 }
                 
                 Section("Accounts") {
-                    // Source account remains restricted to usable money
                     Picker("Account", selection: $selectedAccount) {
                         Text("Select an account").tag(Account?.none)
-                        
                         ForEach(usableActiveAccounts) { account in
                             Text(account.name).tag(Optional(account))
                         }
@@ -69,7 +82,6 @@ struct AddRecurringTransactionView: View {
                         // NEW: Destination account can be ANY active account
                         Picker("To Account", selection: $selectedToAccount) {
                             Text("Select destination").tag(Account?.none)
-                            
                             ForEach(activeAccounts) { account in
                                 Text(account.name).tag(Optional(account))
                             }
@@ -81,7 +93,6 @@ struct AddRecurringTransactionView: View {
                     Section("Category") {
                         Picker("Category", selection: $selectedCategory) {
                             Text("Select a category").tag(Category?.none)
-                            
                             ForEach(filteredCategories) { category in
                                 Text(category.name).tag(Optional(category))
                             }
@@ -89,18 +100,13 @@ struct AddRecurringTransactionView: View {
                     }
                 }
             }
-            .navigationTitle("Add Recurring")
+            .navigationTitle("Edit Recurring")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
+                    Button("Cancel") { dismiss() }
                 }
-                
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Save") {
-                        saveRecurringTransaction()
-                    }
+                    Button("Save") { updateRecurringTransaction() }
                     .disabled(!isFormValid)
                 }
             }
@@ -108,16 +114,10 @@ struct AddRecurringTransactionView: View {
                 switch newType {
                 case .income:
                     selectedToAccount = nil
-                    if selectedCategory?.kind != CategoryKind.income {
-                        selectedCategory = nil
-                    }
-                    
+                    if selectedCategory?.kind != CategoryKind.income { selectedCategory = nil }
                 case .expense:
                     selectedToAccount = nil
-                    if selectedCategory?.kind != CategoryKind.expense {
-                        selectedCategory = nil
-                    }
-                    
+                    if selectedCategory?.kind != CategoryKind.expense { selectedCategory = nil }
                 case .transfer:
                     selectedCategory = nil
                 }
@@ -125,75 +125,48 @@ struct AddRecurringTransactionView: View {
         }
     }
     
-    // All active accounts (used for transfers)
+    // NEW: All active accounts (used for transfers)
     private var activeAccounts: [Account] {
         accounts.filter { !$0.isArchived }
     }
     
-    // Only Checking or Credit Card (used for the source of funds)
     private var usableActiveAccounts: [Account] {
         accounts.filter { !$0.isArchived && ($0.type == .checking || $0.type == .creditCard) }
     }
     
-    // Filters categories to match the selected transaction type.
     private var filteredCategories: [Category] {
         switch selectedType {
-        case .income:
-            return categories.filter { category in
-                category.kind == CategoryKind.income
-            }
-        case .expense:
-            return categories.filter { category in
-                category.kind == CategoryKind.expense
-            }
-        case .transfer:
-            return []
+        case .income: return categories.filter { $0.kind == CategoryKind.income }
+        case .expense: return categories.filter { $0.kind == CategoryKind.expense }
+        case .transfer: return []
         }
     }
     
-    // Validates the recurring transaction form.
     private var isFormValid: Bool {
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        guard !trimmedTitle.isEmpty, amount > 0, selectedAccount != nil else {
-            return false
-        }
+        guard !trimmedTitle.isEmpty, amount > 0, selectedAccount != nil else { return false }
         
         switch selectedType {
-        case .income:
-            return selectedCategory?.kind == CategoryKind.income
-            
-        case .expense:
-            return selectedCategory?.kind == CategoryKind.expense
-            
+        case .income: return selectedCategory?.kind == CategoryKind.income
+        case .expense: return selectedCategory?.kind == CategoryKind.expense
         case .transfer:
             guard let selectedToAccount else { return false }
             return selectedToAccount.id != selectedAccount?.id
         }
     }
     
-    // Saves the recurring rule to SwiftData.
-    private func saveRecurringTransaction() {
+    private func updateRecurringTransaction() {
         guard isFormValid else { return }
-        
-        let newRecurringTransaction = RecurringTransaction(
-            title: title.trimmingCharacters(in: .whitespacesAndNewlines),
-            amount: amount,
-            type: selectedType,
-            frequency: selectedFrequency,
-            nextDate: nextDate,
-            note: note.trimmingCharacters(in: .whitespacesAndNewlines),
-            account: selectedAccount,
-            toAccount: selectedType == .transfer ? selectedToAccount : nil,
-            category: selectedType == .transfer ? nil : selectedCategory,
-            isActive: isActive
-        )
-        
-        modelContext.insert(newRecurringTransaction)
+        recurringTransaction.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        recurringTransaction.amount = amount
+        recurringTransaction.type = selectedType
+        recurringTransaction.frequency = selectedFrequency
+        recurringTransaction.nextDate = nextDate
+        recurringTransaction.note = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        recurringTransaction.account = selectedAccount
+        recurringTransaction.toAccount = selectedType == .transfer ? selectedToAccount : nil
+        recurringTransaction.category = selectedType == .transfer ? nil : selectedCategory
+        recurringTransaction.isActive = isActive
         dismiss()
     }
-}
-
-#Preview {
-    AddRecurringTransactionView()
 }

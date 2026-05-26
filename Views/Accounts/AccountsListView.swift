@@ -15,6 +15,9 @@ struct AccountsListView: View {
     // 1. FETCH RAW DATA
     @Query(sort: \Account.name) private var accounts: [Account]
     
+    // NEW: Fetch our account groups
+    @Query(sort: \AccountGroup.name) private var accountGroups: [AccountGroup]
+    
     @State private var isShowingAddAccount = false
     @State private var selectedAccount: Account?
     
@@ -24,6 +27,11 @@ struct AccountsListView: View {
     // 2. INJECT INTO VIEW MODEL
     private var viewModel: AccountsViewModel {
         AccountsViewModel(accounts: accounts)
+    }
+    
+    // Helper to find active accounts that don't belong to any group
+    private var ungroupedActiveAccounts: [Account] {
+        viewModel.activeAccounts.filter { $0.group == nil }
     }
     
     var body: some View {
@@ -37,25 +45,59 @@ struct AccountsListView: View {
                     )
                 } else {
                     List {
-                        // Active accounts section
-                        if !viewModel.activeAccounts.isEmpty {
-                            Section("Active Accounts") {
-                                ForEach(viewModel.activeAccounts) { account in
-                                    accountRow(for: account)
-                                        .swipeActions {
-                                            Button {
-                                                // Ask for confirmation before archiving.
-                                                accountPendingArchive = account
-                                            } label: {
-                                                Label("Archive", systemImage: "archivebox")
+                        // 1. GROUPED ACTIVE ACCOUNTS
+                        ForEach(accountGroups) { group in
+                            // Only get active accounts for this specific group
+                            let groupAccounts = viewModel.activeAccounts.filter { $0.group == group }
+                            
+                            // Only show the group if it has active accounts
+                            if !groupAccounts.isEmpty {
+                                Section {
+                                    ForEach(groupAccounts) { account in
+                                        accountRow(for: account)
+                                            .swipeActions {
+                                                archiveSwipeButton(for: account)
                                             }
-                                            .tint(.orange)
-                                        }
+                                    }
+                                } header: {
+                                    // Custom Header showing Group Name and Total Balance
+                                    HStack {
+                                        Text(group.name)
+                                            .font(.headline)
+                                            .foregroundStyle(.primary)
+                                            .textCase(nil) // Prevents iOS from forcing all-caps on section headers
+                                        
+                                        Spacer()
+                                        
+                                        // Calculate sum of only the active accounts in this group
+                                        let groupTotal = groupAccounts.reduce(0) { $0 + $1.balance }
+                                        MoneyText(amount: groupTotal)
+                                            .font(.headline)
+                                            .foregroundStyle(.primary)
+                                    }
                                 }
                             }
                         }
                         
-                        // Archived accounts section
+                        // 2. UNGROUPED ACTIVE ACCOUNTS
+                        if !ungroupedActiveAccounts.isEmpty {
+                            Section {
+                                ForEach(ungroupedActiveAccounts) { account in
+                                    accountRow(for: account)
+                                        .swipeActions {
+                                            archiveSwipeButton(for: account)
+                                        }
+                                }
+                            } header: {
+                                Text("Other Accounts")
+                                    .font(.headline)
+                                    .foregroundStyle(.primary)
+                                    .textCase(nil)
+                            }
+                        }
+                        
+                        // 3. ARCHIVED ACCOUNTS
+                        // We leave these flat (ungrouped) since they are just historical records
                         if !viewModel.archivedAccounts.isEmpty {
                             Section("Archived Accounts") {
                                 ForEach(viewModel.archivedAccounts) { account in
@@ -118,6 +160,20 @@ struct AccountsListView: View {
         }
     }
     
+    // MARK: - UI Components
+    
+    // Extracted the archive swipe button to avoid repeating code in the groups
+    @ViewBuilder
+    private func archiveSwipeButton(for account: Account) -> some View {
+        Button {
+            // Ask for confirmation before archiving.
+            accountPendingArchive = account
+        } label: {
+            Label("Archive", systemImage: "archivebox")
+        }
+        .tint(.orange)
+    }
+    
     // Reusable row view for an account.
     @ViewBuilder
     private func accountRow(for account: Account) -> some View {
@@ -142,7 +198,7 @@ struct AccountsListView: View {
         .opacity(account.isArchived ? 0.6 : 1.0)
     }
     
-    // UI Interactions that modify the database
+    // MARK: - UI Interactions that modify the database
     
     // Marks an account as archived.
     private func archiveAccount(_ account: Account) {

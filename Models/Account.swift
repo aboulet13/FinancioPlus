@@ -49,6 +49,10 @@ final class Account {
     // The date when the account was created in the app.
     var createdAt: Date
     
+    // The link back to the AccountGroup.
+    // It is optional (?) because an account might be "ungrouped" when first created.
+    var group: AccountGroup?
+    
     // This initializer defines how to create a new Account object.
     init(
         id: UUID = UUID(),
@@ -57,7 +61,8 @@ final class Account {
         balance: Double = 0.0,
         isArchived: Bool = false,
         category: AccountCategory = .asset, // Default to Asset for safety
-        createdAt: Date = Date()
+        createdAt: Date = Date(),
+        group: AccountGroup? = nil // NEW: Pass the group into the initializer
     ) {
         self.id = id
         self.name = name
@@ -66,5 +71,6 @@ final class Account {
         self.isArchived = isArchived
         self.category = category
         self.createdAt = createdAt
+        self.group = group // NEW: Assign it
     }
 }

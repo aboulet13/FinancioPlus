@@ -10,7 +10,11 @@ import SwiftData
 
 struct EditAccountView: View {
     
+    @Environment(\.modelContext) private var modelContext // NEW: Added so we can insert new groups if needed
     @Environment(\.dismiss) private var dismiss
+    
+    // NEW: Fetch existing groups for smart matching
+    @Query private var existingGroups: [AccountGroup]
     
     // 1. THE DATABASE OBJECT
     let account: Account
@@ -21,6 +25,9 @@ struct EditAccountView: View {
     @State private var balance: Double?
     @State private var category: AccountCategory
     
+    // NEW: Group UI State
+    @State private var groupName: String
+    
     // 3. CUSTOM INITIALIZER
     init(account: Account) {
         self.account = account
@@ -30,13 +37,16 @@ struct EditAccountView: View {
         _type = State(initialValue: account.type)
         _balance = State(initialValue: account.balance)
         _category = State(initialValue: account.category)
+        
+        // NEW: Pre-fill the group name if this account already belongs to one
+        _groupName = State(initialValue: account.group?.name ?? "")
     }
     
     var body: some View {
         NavigationStack {
             Form {
                 
-                // NEW: The Category Toggle
+                // The Category Toggle
                 Section {
                     Picker("Category", selection: $category) {
                         ForEach(AccountCategory.allCases, id: \.self) { cat in
@@ -60,6 +70,15 @@ struct EditAccountView: View {
                     
                     TextField("Current Balance", value: $balance, format: .number)
                         .keyboardType(.numbersAndPunctuation)
+                }
+                
+                // NEW: Organization Section
+                Section {
+                    TextField("e.g. Chase Bank, Fidelity...", text: $groupName)
+                } header: {
+                    Text("Group Name (Optional)")
+                } footer: {
+                    Text("Typing a new name will automatically create a group. Typing an existing name will attach this account to it.")
                 }
             }
             .navigationTitle("Edit Account")
@@ -86,11 +105,28 @@ struct EditAccountView: View {
     }
     
     private func updateAccount() {
-        // Write the temporary UI state back into the live database object
+        // Step 1: Handle Smart Group matching
+        var resolvedGroup: AccountGroup? = nil
+        let trimmedGroupName = groupName.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if !trimmedGroupName.isEmpty {
+            // Check if a group with this name already exists
+            if let matchedGroup = existingGroups.first(where: { $0.name.caseInsensitiveCompare(trimmedGroupName) == .orderedSame }) {
+                resolvedGroup = matchedGroup
+            } else {
+                // Create a new group if it doesn't exist
+                let newGroup = AccountGroup(name: trimmedGroupName)
+                modelContext.insert(newGroup)
+                resolvedGroup = newGroup
+            }
+        }
+        
+        // Step 2: Write the temporary UI state back into the live database object
         account.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
         account.type = type
         account.balance = balance ?? 0.0 // positive or negative numbers
         account.category = category    // Save the updated category
+        account.group = resolvedGroup  // NEW: Save the resolved group
         
         dismiss() // Close the sheet
     }

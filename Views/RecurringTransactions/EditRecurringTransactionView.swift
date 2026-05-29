@@ -54,8 +54,7 @@ struct EditRecurringTransactionView: View {
                         }
                     }
                     
-                    TextField("Amount", value: $amount, format: .number)
-                        .keyboardType(.decimalPad)
+                    SmartDecimalField("Amount", value: $amount)
                     
                     Picker("Frequency", selection: $selectedFrequency) {
                         ForEach(RecurringFrequency.allCases, id: \.self) { frequency in

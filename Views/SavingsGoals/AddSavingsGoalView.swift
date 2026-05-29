@@ -34,11 +34,9 @@ struct AddSavingsGoalView: View {
                 Section("Goal Details") {
                     TextField("Goal Name (e.g. Vacation)", text: $title)
                     
-                    TextField("Target Amount", value: $targetAmount, format: .number)
-                        .keyboardType(.decimalPad)
+                    SmartDecimalField("Target Amount", value: $targetAmount)
                     
-                    TextField("Already Saved (Optional)", value: $currentAmount, format: .number)
-                        .keyboardType(.decimalPad)
+                    SmartDecimalField("Already Saved (Optional)", value: $currentAmount)
                 }
                 
                 Section("Timeline") {

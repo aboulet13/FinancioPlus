@@ -44,8 +44,7 @@ struct EditBudgetView: View {
                         }
                     }
                     
-                    TextField("Planned Amount", value: $plannedAmount, format: .number)
-                        .keyboardType(.decimalPad)
+                    SmartDecimalField("Planned Amount", value: $plannedAmount)
                 }
                 
                 // Show a warning if editing would create a duplicate budget.

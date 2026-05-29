@@ -52,8 +52,7 @@ struct AddTransactionView: View {
                             }
                         }
                     
-                    TextField("Amount", value: $amount, format: .number)
-                        .keyboardType(.decimalPad)
+                    SmartDecimalField("Amount", value: $amount)
                     
                     DatePicker("Date", selection: $date, displayedComponents: .date)
                     

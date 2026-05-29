@@ -41,101 +41,75 @@ struct BudgetView: View {
                 // Month Navigation Header
                 HStack {
                     Button {
-                        goToPreviousMonth()
+                        withAnimation { goToPreviousMonth() }
                     } label: {
-                        Image(systemName: "chevron.left")
+                        Image(systemName: "chevron.left.circle.fill")
+                            .font(.title2)
+                            .foregroundStyle(.secondary, Color(.systemGray5))
                     }
                     
                     Spacer()
                     
                     Text(viewModel.monthYearTitle) // Purely driven by ViewModel
                         .font(.headline)
+                        .bold()
+                        // This modifier makes the text transition smoothly when changing months
+                        .contentTransition(.numericText())
                     
                     Spacer()
                     
                     Button {
-                        goToNextMonth()
+                        withAnimation { goToNextMonth() }
                     } label: {
-                        Image(systemName: "chevron.right")
+                        Image(systemName: "chevron.right.circle.fill")
+                            .font(.title2)
+                            .foregroundStyle(.secondary, Color(.systemGray5))
                     }
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.vertical, 12)
+                .background(Color(.systemBackground))
+                
+                Divider()
                 
                 Group {
                     if viewModel.selectedMonthBudgets.isEmpty {
                         ContentUnavailableView(
-                            "No Budgets Yet",
+                            "No Budgets Set",
                             systemImage: "chart.pie",
                             description: Text("Add your first monthly budget to start planning your spending.")
                         )
                     } else {
-                        List {
-                            ForEach(viewModel.selectedMonthBudgets) { budget in
-                                VStack(alignment: .leading, spacing: 10) {
-                                    
-                                    Text(budget.category?.name ?? "Unknown Category")
-                                        .font(.headline)
-                                    
-                                    HStack {
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text("Planned")
-                                                .font(.caption)
-                                                .foregroundStyle(.secondary)
-                                            MoneyText(amount: budget.plannedAmount)
-                                                .font(.subheadline)
+                        ScrollView {
+                            LazyVStack(spacing: 16) {
+                                ForEach(viewModel.selectedMonthBudgets) { budget in
+                                    budgetCard(for: budget)
+                                        .onTapGesture {
+                                            selectedBudget = budget
                                         }
-                                        
-                                        Spacer()
-                                        
-                                        VStack(alignment: .center, spacing: 4) {
-                                            Text("Spent")
-                                                .font(.caption)
-                                                .foregroundStyle(.secondary)
-                                            MoneyText(amount: viewModel.spentAmount(for: budget))
-                                                .font(.subheadline)
-                                                .foregroundStyle(.red)
+                                        // We use contextMenu here since we aren't using a standard List anymore
+                                        .contextMenu {
+                                            Button {
+                                                selectedBudget = budget
+                                            } label: {
+                                                Label("Edit Budget", systemImage: "pencil")
+                                            }
+                                            
+                                            Button(role: .destructive) {
+                                                budgetPendingDeletion = budget
+                                            } label: {
+                                                Label("Delete Budget", systemImage: "trash")
+                                            }
                                         }
-                                        
-                                        Spacer()
-                                        
-                                        VStack(alignment: .trailing, spacing: 4) {
-                                            Text("Remaining")
-                                                .font(.caption)
-                                                .foregroundStyle(.secondary)
-                                            MoneyText(amount: viewModel.remainingAmount(for: budget))
-                                                .font(.subheadline)
-                                                .bold()
-                                                .foregroundStyle(viewModel.remainingAmount(for: budget) >= 0 ? .green : .red)
-                                        }
-                                    }
-                                    
-                                    VStack(alignment: .leading, spacing: 6) {
-                                        ProgressView(value: viewModel.progressValue(for: budget))
-                                            .tint(viewModel.progressColor(for: budget))
-                                        
-                                        Text(viewModel.progressText(for: budget))
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                }
-                                .padding(.vertical, 8)
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    selectedBudget = budget
-                                }
-                                .swipeActions {
-                                    Button(role: .destructive) {
-                                        budgetPendingDeletion = budget
-                                    } label: {
-                                        Label("Delete", systemImage: "trash")
-                                    }
                                 }
                             }
+                            .padding()
                         }
+                        .background(Color(.systemGroupedBackground))
                     }
                 }
             }
-            .navigationTitle("Budget")
+            .navigationTitle("Budgets")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -179,7 +153,95 @@ struct BudgetView: View {
         }
     }
     
-    // UI State modification stays in the View layer
+    // MARK: - UI Components
+    
+    // Upgraded Budget Card Design
+    @ViewBuilder
+    private func budgetCard(for budget: Budget) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            
+            // Top Row: Category Name & Icon
+            HStack {
+                // If you have icon/color data in the Category, you can add the colored icon here!
+                if let category = budget.category {
+                    Image(systemName: category.iconName)
+                        .foregroundStyle(Color(hex: category.colorHex))
+                        .frame(width: 28, height: 28)
+                        .background(Color(hex: category.colorHex).opacity(0.15))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                }
+                
+                Text(budget.category?.name ?? "Unknown Category")
+                    .font(.headline)
+                
+                Spacer()
+                
+                Image(systemName: "ellipsis")
+                    .foregroundStyle(.tertiary)
+            }
+            
+            // Middle Row: Financial Breakdown
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Planned")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    MoneyText(amount: budget.plannedAmount)
+                        .font(.subheadline)
+                        .bold()
+                }
+                
+                Spacer()
+                
+                VStack(alignment: .center, spacing: 4) {
+                    Text("Spent")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    MoneyText(amount: viewModel.spentAmount(for: budget))
+                        .font(.subheadline)
+                        .foregroundStyle(.red)
+                }
+                
+                Spacer()
+                
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text("Remaining")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    MoneyText(amount: viewModel.remainingAmount(for: budget))
+                        .font(.subheadline)
+                        .bold()
+                        .foregroundStyle(viewModel.remainingAmount(for: budget) >= 0 ? .green : .red)
+                }
+            }
+            
+            // Bottom Row: Progress Bar
+            VStack(alignment: .leading, spacing: 6) {
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Capsule()
+                            .fill(Color.gray.opacity(0.2))
+                        
+                        Capsule()
+                            .fill(viewModel.progressColor(for: budget))
+                            .frame(width: geo.size.width * CGFloat(viewModel.progressValue(for: budget)))
+                    }
+                }
+                .frame(height: 8)
+                
+                Text(viewModel.progressText(for: budget))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(16)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
+    }
+    
+    // MARK: - Logic
+    
     private func goToPreviousMonth() {
         if selectedMonth == 1 {
             selectedMonth = 12
@@ -201,8 +263,4 @@ struct BudgetView: View {
     private func deleteBudget(_ budget: Budget) {
         modelContext.delete(budget)
     }
-}
-
-#Preview {
-    BudgetView()
 }

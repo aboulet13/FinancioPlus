@@ -76,12 +76,24 @@ struct BudgetViewModel {
         guard budget.plannedAmount > 0 else { return "No budget set" }
         
         let percentage = (spentAmount(for: budget) / budget.plannedAmount) * 100
-        return String(format: "%.0f%% of budget used", percentage)
+        
+        // Slightly updated to warn the user if they went over 100%
+        if percentage > 100 {
+            return String(format: "Over budget by %.0f%%", percentage - 100)
+        } else {
+            return String(format: "%.0f%% of budget used", percentage)
+        }
     }
     
-    // Determines if the progress bar should be red (over budget) or blue (on track).
+    // UPDATED: Determines if the progress bar should be red (over budget) or the Category's color!
     func progressColor(for budget: Budget) -> Color {
-        remainingAmount(for: budget) >= 0 ? .blue : .red
+        if remainingAmount(for: budget) < 0 {
+            return .red
+        } else if let hex = budget.category?.colorHex {
+            return Color(hex: hex)
+        } else {
+            return .blue // Fallback
+        }
     }
     
     // Helper function to verify if a transaction falls within the viewed month.

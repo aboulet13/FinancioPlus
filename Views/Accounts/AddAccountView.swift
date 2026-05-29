@@ -53,9 +53,7 @@ struct AddAccountView: View {
                         }
                     }
                     
-                    TextField("Starting Balance", value: $balance, format: .number)
-                        // Changed so the minus sign (-) is available on the keyboard for debt
-                        .keyboardType(.numbersAndPunctuation)
+                    SmartDecimalField("Starting Balance", value: $balance, allowNegative: true)
                 }
                 
                 // NEW: Organization Section

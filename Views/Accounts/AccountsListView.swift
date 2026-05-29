@@ -15,16 +15,12 @@ struct AccountsListView: View {
     // 1. FETCH RAW DATA
     @Query(sort: \Account.name) private var accounts: [Account]
     
-    // Fetch our account groups
     @Query(sort: \AccountGroup.name) private var accountGroups: [AccountGroup]
     
     @State private var isShowingAddAccount = false
     @State private var selectedAccount: Account?
     
-    // Stores the account the user is about to archive.
     @State private var accountPendingArchive: Account?
-    
-    // Stores the account the user is about to permanently delete.
     @State private var accountPendingDelete: Account?
     
     // 2. INJECT INTO VIEW MODEL
@@ -32,7 +28,6 @@ struct AccountsListView: View {
         AccountsViewModel(accounts: accounts)
     }
     
-    // Helper to find active accounts that don't belong to any group
     private var ungroupedActiveAccounts: [Account] {
         viewModel.activeAccounts.filter { $0.group == nil }
     }
@@ -48,12 +43,18 @@ struct AccountsListView: View {
                     )
                 } else {
                     List {
+                        // NEW: Net Worth Hero Card placed at the top of the list!
+                        netWorthCard
+                            .listRowInsets(EdgeInsets()) // Removes default list padding
+                            .listRowBackground(Color.clear) // Makes it look like a floating card
+                            .listRowSeparator(.hidden) // Removes the list line under the card
+                            .padding(.bottom, 8)
+                            .padding(.horizontal) // Add horizontal padding back to match inset lists
+                        
                         // 1. GROUPED ACTIVE ACCOUNTS
                         ForEach(accountGroups) { group in
-                            // Only get active accounts for this specific group
                             let groupAccounts = viewModel.activeAccounts.filter { $0.group == group }
                             
-                            // Only show the group if it has active accounts
                             if !groupAccounts.isEmpty {
                                 Section {
                                     ForEach(groupAccounts) { account in
@@ -63,16 +64,14 @@ struct AccountsListView: View {
                                             }
                                     }
                                 } header: {
-                                    // Custom Header showing Group Name and Total Balance
                                     HStack {
                                         Text(group.name)
                                             .font(.headline)
                                             .foregroundStyle(.primary)
-                                            .textCase(nil) // Prevents iOS from forcing all-caps on section headers
+                                            .textCase(nil)
                                         
                                         Spacer()
                                         
-                                        // Calculate sum of only the active accounts in this group
                                         let groupTotal = groupAccounts.reduce(0) { $0 + $1.balance }
                                         MoneyText(amount: groupTotal)
                                             .font(.headline)
@@ -100,7 +99,6 @@ struct AccountsListView: View {
                         }
                         
                         // 3. ARCHIVED ACCOUNTS
-                        // We leave these flat (ungrouped) since they are just historical records
                         if !viewModel.archivedAccounts.isEmpty {
                             Section("Archived Accounts") {
                                 ForEach(viewModel.archivedAccounts) { account in
@@ -130,16 +128,12 @@ struct AccountsListView: View {
             .sheet(item: $selectedAccount) { account in
                 EditAccountView(account: account)
             }
-            // MARK: - Confirmation Dialogs
-            // ARCHIVE DIALOG
             .confirmationDialog(
                 "Archive this account?",
                 isPresented: Binding(
                     get: { accountPendingArchive != nil },
                     set: { newValue in
-                        if newValue == false {
-                            accountPendingArchive = nil
-                        }
+                        if newValue == false { accountPendingArchive = nil }
                     }
                 ),
                 titleVisibility: .visible
@@ -150,22 +144,16 @@ struct AccountsListView: View {
                         self.accountPendingArchive = nil
                     }
                 }
-                
-                Button("Cancel", role: .cancel) {
-                    accountPendingArchive = nil
-                }
+                Button("Cancel", role: .cancel) { accountPendingArchive = nil }
             } message: {
                 Text("Archived accounts are hidden from active lists, excluded from total balance, and unavailable for new transactions.")
             }
-            // DELETE DIALOG
             .confirmationDialog(
                 "Permanently delete this account?",
                 isPresented: Binding(
                     get: { accountPendingDelete != nil },
                     set: { newValue in
-                        if newValue == false {
-                            accountPendingDelete = nil
-                        }
+                        if newValue == false { accountPendingDelete = nil }
                     }
                 ),
                 titleVisibility: .visible
@@ -176,10 +164,7 @@ struct AccountsListView: View {
                         self.accountPendingDelete = nil
                     }
                 }
-                
-                Button("Cancel", role: .cancel) {
-                    accountPendingDelete = nil
-                }
+                Button("Cancel", role: .cancel) { accountPendingDelete = nil }
             } message: {
                 Text("Deleting this account will permanently remove it from your database. This action cannot be undone.")
             }
@@ -188,10 +173,95 @@ struct AccountsListView: View {
     
     // MARK: - UI Components
     
-    // Extracted swipe actions for Active accounts
+    // NEW: The migrated Net Worth Card
+    private var netWorthCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Net Worth")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .textCase(.uppercase)
+                
+                MoneyText(amount: calculatedNetWorth)
+                    .font(.system(size: 40, weight: .bold, design: .rounded))
+                    .foregroundStyle(calculatedNetWorth >= 0 ? Color.primary : Color.red)
+            }
+            
+            Divider()
+                        
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Usable")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    MoneyText(amount: calculatedUsable)
+                        .font(.headline)
+                        .foregroundStyle(Color.primary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
+                
+                Spacer()
+                
+                VStack(alignment: .center, spacing: 4) {
+                    Text("Savings")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    MoneyText(amount: calculatedSavings)
+                        .font(.headline)
+                        .foregroundStyle(.blue)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
+                
+                Spacer()
+                
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text("Invested")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    MoneyText(amount: calculatedInvested)
+                        .font(.headline)
+                        .foregroundStyle(.purple)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(20)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
+    }
+    
+    // MARK: - Net Worth Calculations
+    // Brought over from the Dashboard to keep this view perfectly standalone
+    
+    private var calculatedNetWorth: Double {
+        let active = accounts.filter { !$0.isArchived }
+        let assets = active.filter { $0.category == .asset }.reduce(0) { $0 + $1.balance }
+        let liabilities = abs(active.filter { $0.category == .liability }.reduce(0) { $0 + $1.balance })
+        return assets - liabilities
+    }
+    
+    private var calculatedUsable: Double {
+        accounts.filter { !$0.isArchived && ($0.type == .checking || $0.type == .cash) }.reduce(0) { $0 + $1.balance }
+    }
+    
+    private var calculatedSavings: Double {
+        accounts.filter { !$0.isArchived && $0.type == .savings }.reduce(0) { $0 + $1.balance }
+    }
+    
+    private var calculatedInvested: Double {
+        accounts.filter { !$0.isArchived && $0.type == .investment }.reduce(0) { $0 + $1.balance }
+    }
+    
+    // MARK: - Row & Swipe Actions
+    
     @ViewBuilder
     private func activeSwipeActions(for account: Account) -> some View {
-        // 1st Button (Outermost / Full-Swipe action): Archive
         Button {
             accountPendingArchive = account
         } label: {
@@ -199,19 +269,16 @@ struct AccountsListView: View {
         }
         .tint(.orange)
         
-        // 2nd Button (Innermost): Delete
         Button(role: .destructive) {
             accountPendingDelete = account
         } label: {
             Label("Delete", systemImage: "trash")
         }
-        .tint(.red) // Explicitly forcing the red color
+        .tint(.red)
     }
     
-    // Extracted swipe actions for Archived accounts
     @ViewBuilder
     private func archivedSwipeActions(for account: Account) -> some View {
-        // 1st Button (Outermost / Full-Swipe action): Unarchive
         Button {
             unarchiveAccount(account)
         } label: {
@@ -219,16 +286,14 @@ struct AccountsListView: View {
         }
         .tint(.blue)
         
-        // 2nd Button (Innermost): Delete
         Button(role: .destructive) {
             accountPendingDelete = account
         } label: {
             Label("Delete", systemImage: "trash")
         }
-        .tint(.red) // Explicitly forcing the red color
+        .tint(.red)
     }
     
-    // Reusable row view for an account.
     @ViewBuilder
     private func accountRow(for account: Account) -> some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -248,23 +313,14 @@ struct AccountsListView: View {
         .onTapGesture {
             selectedAccount = account
         }
-        // Visually dim archived accounts
         .opacity(account.isArchived ? 0.6 : 1.0)
     }
     
-    // MARK: - UI Interactions that modify the database
+    // MARK: - Database Actions
     
-    private func archiveAccount(_ account: Account) {
-        account.isArchived = true
-    }
-    
-    private func unarchiveAccount(_ account: Account) {
-        account.isArchived = false
-    }
-    
-    private func deleteAccount(_ account: Account) {
-        modelContext.delete(account)
-    }
+    private func archiveAccount(_ account: Account) { account.isArchived = true }
+    private func unarchiveAccount(_ account: Account) { account.isArchived = false }
+    private func deleteAccount(_ account: Account) { modelContext.delete(account) }
 }
 
 #Preview {

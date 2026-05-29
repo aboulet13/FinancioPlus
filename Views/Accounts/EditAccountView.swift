@@ -68,8 +68,7 @@ struct EditAccountView: View {
                         }
                     }
                     
-                    TextField("Current Balance", value: $balance, format: .number)
-                        .keyboardType(.numbersAndPunctuation)
+                    SmartDecimalField("Current Balance", value: $balance, allowNegative: true)
                 }
                 
                 // NEW: Organization Section

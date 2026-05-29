@@ -43,8 +43,7 @@ struct AddBudgetView: View {
                         }
                     }
                     
-                    TextField("Planned Amount", value: $plannedAmount, format: .number)
-                        .keyboardType(.decimalPad)
+                    SmartDecimalField("Planned Amount", value: $plannedAmount)
                 }
                 
                 // Show a warning if the selected category already has

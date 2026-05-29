@@ -14,14 +14,29 @@ struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
     
     // 1. FETCH DATA
-    // We request the persistent arrays directly from SwiftData container context
     @Query private var accounts: [Account]
+    // We fetch BudgetTransaction (as named in your repo) instead of Transaction
     @Query(sort: \BudgetTransaction.date, order: .reverse) private var transactions: [BudgetTransaction]
     
+    // We need Categories and Budgets to calculate the card data
+    @Query(sort: \Category.name) private var categories: [Category]
+    @Query private var budgets: [Budget]
+    
     // 2. INJECT INTO VIEWMODEL
-    // We use @State here because DashboardViewModel is now an @Observable class.
-    // This allows the view to own the model and react to its calculated properties.
     @State private var viewModel = DashboardViewModel()
+    
+    // 3. UI PREFERENCES (The Dashboard Layout)
+    // We store a comma-separated string of Category UUIDs. This avoids altering our SwiftData schema!
+    @AppStorage("pinnedBudgetCards") private var pinnedBudgetCardsString: String = ""
+    
+    // Tracks whether the user is long-pressing to delete cards
+    @State private var isEditingBudgets: Bool = false
+    
+    // A computed property that safely translates our AppStorage string into an array of UUIDs
+    // (Notice there is no 'set' block here to keep Swift's immutability rules happy)
+    private var pinnedCategoryIDs: [UUID] {
+        pinnedBudgetCardsString.split(separator: ",").compactMap { UUID(uuidString: String($0)) }
+    }
     
     var body: some View {
         NavigationStack {
@@ -29,17 +44,17 @@ struct DashboardView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     
-                    // 1. HERO SECTION: Net Worth / Total Balance
-                    heroCard
+                    // 1. HERO SECTION: Cash Flow (Moved to the top!)
+                    cashFlowCard
                     
-                    // 2. GRAPH SPACE: Scrollable Cards (Line & Donut)
+                    // 2. NEW: BUDGET GRID SECTION
+                    budgetsSection
+                    
+                    // 3. GRAPH SPACE: Scrollable Cards (Line & Donut)
                     scrollableChartsSection
                     
-                    // 3. CHART SECTION: Displays asset allocation distribution
+                    // 4. CHART SECTION: Displays asset allocation distribution
                     assetAllocationCard
-                    
-                    // 4. CASH FLOW SECTION
-                    cashFlowCard
                     
                     // 5. ACTION CENTER: Savings & Reports
                     actionCenterCard
@@ -48,254 +63,33 @@ struct DashboardView: View {
                 .padding(.horizontal)
                 .padding(.vertical, 8)
             }
-            .background(Color(.systemGroupedBackground)) // The classic iOS light gray background
+            .background(Color(.systemGroupedBackground))
             .navigationTitle("Dashboard")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    QuickAddMenu() // Instant global shortcut insertion panel
+                    QuickAddMenu()
                 }
             }
-            // Update the ViewModel when the View first loads
             .onAppear {
                 viewModel.accounts = accounts
                 viewModel.transactions = transactions
             }
-            // Keep the ViewModel in sync if SwiftData changes the accounts array
             .onChange(of: accounts) { _, newAccounts in
                 viewModel.accounts = newAccounts
             }
-            // Keep the ViewModel in sync if SwiftData changes the transactions array
             .onChange(of: transactions) { _, newTransactions in
                 viewModel.transactions = newTransactions
+            }
+            // Tap anywhere on the background to exit "Edit Mode"
+            .onTapGesture {
+                if isEditingBudgets {
+                    withAnimation { isEditingBudgets = false }
+                }
             }
         }
     }
     
     // MARK: - UI Components
-    
-    // The sideways scrollable section for our current month insights
-    private var scrollableChartsSection: some View {
-        TabView {
-            // CARD 1: Line Graph for Daily Spending
-            ChartCard(title: "Daily Spending (This Month)") {
-                if viewModel.dailySpendingsData.isEmpty {
-                    Text("No spending data yet.")
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    Chart(viewModel.dailySpendingsData) { item in
-                        LineMark(
-                            x: .value("Day", item.date, unit: .day),
-                            y: .value("Amount", item.amount)
-                        )
-                        .interpolationMethod(.monotone) // Smooth curved line
-                        .foregroundStyle(.blue)
-                        
-                        AreaMark(
-                            x: .value("Day", item.date, unit: .day),
-                            y: .value("Amount", item.amount)
-                        )
-                        .interpolationMethod(.monotone)
-                        .foregroundStyle(
-                            .linearGradient(
-                                colors: [.blue.opacity(0.4), .clear],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-                    }
-                    .chartXAxis {
-                        AxisMarks(values: .stride(by: .day)) { value in
-                            if let date = value.as(Date.self) {
-                                let day = Calendar.current.component(.day, from: date)
-                                // Only show labels for the 1st or every 5th day to keep it clean
-                                if day % 5 == 0 || day == 1 {
-                                    AxisValueLabel(format: .dateTime.day())
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // CARD 2: Donut Graph for Category Spending
-            ChartCard(title: "Spending by Category") {
-                if viewModel.spendingByCategoryData.isEmpty {
-                    Text("No expenses yet this month.")
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    Chart(viewModel.spendingByCategoryData) { item in
-                        SectorMark(
-                            angle: .value("Amount", item.amount),
-                            innerRadius: .ratio(0.6), // Creates the donut hole
-                            angularInset: 1.5 // Visual spacing between slices
-                        )
-                        .foregroundStyle(by: .value("Category", item.categoryName))
-                    }
-                }
-            }
-        }
-        // Native iOS pagination
-        .tabViewStyle(.page(indexDisplayMode: .always))
-        // Fixed height to look like a sturdy widget
-        .frame(height: 380)
-        // Offset negative padding to counteract TabView's default dot spacing
-        .padding(.bottom, -16)
-    }
-
-    // A reusable UI component ensuring all swipeable charts look like identical cards
-    private struct ChartCard<Content: View>: View {
-        let title: String
-        let content: Content
-        
-        init(title: String, @ViewBuilder content: () -> Content) {
-            self.title = title
-            self.content = content()
-        }
-        
-        var body: some View {
-            VStack(alignment: .leading, spacing: 16) {
-                Text(title)
-                    .font(.headline)
-                
-                content
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-            .padding(20)
-            .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
-            // Pushes the card up slightly so the TabView dots rest outside the white card area
-            .padding(.bottom, 40)
-            // Ensures the shadow doesn't get clipped by the TabView frame
-            .padding(.horizontal, 4)
-        }
-    }
-    
-    // Upgraded Asset Allocation Card utilizing optimized SectorMark signatures
-    private var assetAllocationCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Asset Allocation")
-                .font(.headline)
-            
-            // Defend against empty database sets to avoid rendering math crash artifacts
-            if !viewModel.hasLiquidityData {
-                ContentUnavailableView(
-                    "No Funds Registered",
-                    systemImage: "chart.pie",
-                    description: Text("Your liquid breakdown appears once balances are entered into active accounts.")
-                )
-            } else {
-                HStack(spacing: 24) {
-                    // Loop over the identifiable chart struct items from our ViewModel
-                    Chart(viewModel.liquidityChartData) { item in
-                        // SectorMark draws the radial sectors of the distribution pie
-                        SectorMark(
-                            angle: .value("Amount", item.amount),
-                            innerRadius: .ratio(0.65) // Trims the inner mass out to form a perfect donut ring
-                        )
-                        .foregroundStyle(item.color.gradient)
-                    }
-                    .frame(width: 120, height: 120)
-                    
-                    // The Itemized Visual Legend Panel
-                    VStack(alignment: .leading, spacing: 10) {
-                        ForEach(viewModel.liquidityChartData) { item in
-                            HStack(spacing: 8) {
-                                Circle()
-                                    .fill(item.color)
-                                    .frame(width: 8, height: 8)
-                                
-                                Text(item.bucketName)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                
-                                Spacer()
-                                
-                                MoneyText(amount: item.amount)
-                                    .font(.caption)
-                                    .bold()
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        .padding(20)
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
-    }
-    
-    // The big, prominent Net Worth card tracking liquidity metrics
-    private var heroCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            
-            // Top: Total Net Worth Value Display
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Net Worth")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .textCase(.uppercase)
-                
-                MoneyText(amount: viewModel.netWorth)
-                    .font(.system(size: 40, weight: .bold, design: .rounded))
-                    .foregroundStyle(viewModel.netWorth >= 0 ? Color.primary : Color.red)
-            }
-            
-            // Separator dividing the aggregate metric from the column list
-            Divider()
-                        
-            // Bottom: Three column structural layout mapping out current availability
-            HStack(alignment: .top) {
-                // Column 1: Usable Checking/Cash funds
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Usable")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    MoneyText(amount: viewModel.usableAmount)
-                        .font(.headline)
-                        .foregroundStyle(Color.primary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                }
-                
-                Spacer()
-                
-                // Column 2: Safety Savings allocations
-                VStack(alignment: .center, spacing: 4) {
-                    Text("Savings")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    MoneyText(amount: viewModel.savingsAmount)
-                        .font(.headline)
-                        .foregroundStyle(.blue)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                }
-                
-                Spacer()
-                
-                // Column 3: Long term invested growth values
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text("Invested")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    MoneyText(amount: viewModel.investmentAmount)
-                        .font(.headline)
-                        .foregroundStyle(.purple)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20)
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
-    }
     
     // The Cash Flow monthly performance visualizer
     private var cashFlowCard: some View {
@@ -354,7 +148,206 @@ struct DashboardView: View {
         .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
     }
     
-    // Modular navigation links container block row mapping
+    // The Budget Grid Section
+    private var budgetsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            
+            // Section Header
+            HStack {
+                Text("This Month’s Budget")
+                    .font(.headline)
+                
+                // Add Card Button
+                Button {
+                    addNewBudgetCard()
+                } label: {
+                    Image(systemName: "plus.circle")
+                        .foregroundStyle(.blue)
+                        .font(.title3)
+                }
+                
+                Spacer()
+                
+                // Done Button (Only shows when wiggling)
+                if isEditingBudgets {
+                    Button("Done") {
+                        withAnimation { isEditingBudgets = false }
+                    }
+                    .font(.subheadline.bold())
+                }
+            }
+            .padding(.top, 8)
+            
+            if pinnedCategoryIDs.isEmpty {
+                Text("Tap the + to pin a budget category here.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 8)
+            } else {
+                // The 2-Column Grid
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    ForEach(Array(pinnedCategoryIDs.enumerated()), id: \.offset) { index, categoryID in
+                        
+                        DashboardBudgetCard(
+                            categoryID: categoryID,
+                            categories: categories,
+                            budgets: budgets,
+                            transactions: transactions,
+                            isEditing: isEditingBudgets,
+                            onRemove: { removeBudgetCard(at: index) },
+                            onChangeCategory: { newCategory in updateBudgetCard(at: index, with: newCategory.id) }
+                        )
+                        // Long press to enter wiggle mode!
+                        .onLongPressGesture {
+                            withAnimation { isEditingBudgets = true }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // The sideways scrollable section for our current month insights
+    private var scrollableChartsSection: some View {
+        TabView {
+            ChartCard(title: "Daily Spending (This Month)") {
+                if viewModel.dailySpendingsData.isEmpty {
+                    Text("No spending data yet.")
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    Chart(viewModel.dailySpendingsData) { item in
+                        LineMark(
+                            x: .value("Day", item.date, unit: .day),
+                            y: .value("Amount", item.amount)
+                        )
+                        .interpolationMethod(.monotone)
+                        .foregroundStyle(.blue)
+                        
+                        AreaMark(
+                            x: .value("Day", item.date, unit: .day),
+                            y: .value("Amount", item.amount)
+                        )
+                        .interpolationMethod(.monotone)
+                        .foregroundStyle(
+                            .linearGradient(
+                                colors: [.blue.opacity(0.4), .clear],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                    }
+                    .chartXAxis {
+                        AxisMarks(values: .stride(by: .day)) { value in
+                            if let date = value.as(Date.self) {
+                                let day = Calendar.current.component(.day, from: date)
+                                if day % 5 == 0 || day == 1 {
+                                    AxisValueLabel(format: .dateTime.day())
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            ChartCard(title: "Spending by Category") {
+                if viewModel.spendingByCategoryData.isEmpty {
+                    Text("No expenses yet this month.")
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    Chart(viewModel.spendingByCategoryData) { item in
+                        SectorMark(
+                            angle: .value("Amount", item.amount),
+                            innerRadius: .ratio(0.6),
+                            angularInset: 1.5
+                        )
+                        .foregroundStyle(by: .value("Category", item.categoryName))
+                    }
+                }
+            }
+        }
+        .tabViewStyle(.page(indexDisplayMode: .always))
+        .frame(height: 380)
+        .padding(.bottom, -16)
+    }
+
+    private struct ChartCard<Content: View>: View {
+        let title: String
+        let content: Content
+        
+        init(title: String, @ViewBuilder content: () -> Content) {
+            self.title = title
+            self.content = content()
+        }
+        
+        var body: some View {
+            VStack(alignment: .leading, spacing: 16) {
+                Text(title)
+                    .font(.headline)
+                
+                content
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .padding(20)
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
+            .padding(.bottom, 40)
+            .padding(.horizontal, 4)
+        }
+    }
+    
+    private var assetAllocationCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Asset Allocation")
+                .font(.headline)
+            
+            if !viewModel.hasLiquidityData {
+                ContentUnavailableView(
+                    "No Funds Registered",
+                    systemImage: "chart.pie",
+                    description: Text("Your liquid breakdown appears once balances are entered into active accounts.")
+                )
+            } else {
+                HStack(spacing: 24) {
+                    Chart(viewModel.liquidityChartData) { item in
+                        SectorMark(
+                            angle: .value("Amount", item.amount),
+                            innerRadius: .ratio(0.65)
+                        )
+                        .foregroundStyle(item.color.gradient)
+                    }
+                    .frame(width: 120, height: 120)
+                    
+                    VStack(alignment: .leading, spacing: 10) {
+                        ForEach(viewModel.liquidityChartData) { item in
+                            HStack(spacing: 8) {
+                                Circle()
+                                    .fill(item.color)
+                                    .frame(width: 8, height: 8)
+                                
+                                Text(item.bucketName)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                
+                                Spacer()
+                                
+                                MoneyText(amount: item.amount)
+                                    .font(.caption)
+                                    .bold()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .padding(20)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
+    }
+    
     private var actionCenterCard: some View {
         VStack(spacing: 0) {
             NavigationLink(destination: SavingsGoalsListView()) {
@@ -403,8 +396,192 @@ struct DashboardView: View {
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
     }
+    
+    // MARK: - AppStorage Array Logic
+    
+    private func addNewBudgetCard() {
+        var currentIDs = pinnedCategoryIDs
+        // Default to the first available category, or an empty UUID if none exist
+        let newID = categories.first?.id ?? UUID()
+        currentIDs.append(newID)
+        
+        // Save directly to the @AppStorage string!
+        pinnedBudgetCardsString = currentIDs.map { $0.uuidString }.joined(separator: ",")
+    }
+
+    private func removeBudgetCard(at index: Int) {
+        var currentIDs = pinnedCategoryIDs
+        currentIDs.remove(at: index)
+        
+        // Save directly to the @AppStorage string!
+        pinnedBudgetCardsString = currentIDs.map { $0.uuidString }.joined(separator: ",")
+    }
+
+    private func updateBudgetCard(at index: Int, with newID: UUID) {
+        var currentIDs = pinnedCategoryIDs
+        currentIDs[index] = newID
+        
+        // Save directly to the @AppStorage string!
+        pinnedBudgetCardsString = currentIDs.map { $0.uuidString }.joined(separator: ",")
+    }
 }
 
-#Preview {
-    DashboardView()
+// MARK: - Reusable Budget Card Component
+struct DashboardBudgetCard: View {
+    let categoryID: UUID
+    let categories: [Category]
+    let budgets: [Budget]
+    let transactions: [BudgetTransaction]
+    
+    let isEditing: Bool
+    let onRemove: () -> Void
+    let onChangeCategory: (Category) -> Void
+    
+    // Animation state for the wiggle
+    @State private var wigglePhase: CGFloat = 0
+
+    // 1. Find the actual Category object from the UUID
+    private var currentCategory: Category? {
+        categories.first(where: { $0.id == categoryID })
+    }
+    
+    // 2. Find the planned amount for THIS month
+    private var plannedAmount: Double {
+        let currentMonth = Calendar.current.component(.month, from: Date())
+        let currentYear = Calendar.current.component(.year, from: Date())
+        return budgets.first(where: { $0.category?.id == categoryID && $0.month == currentMonth && $0.year == currentYear })?.plannedAmount ?? 0.0
+    }
+    
+    // 3. Find the spent amount for THIS month
+    private var spentAmount: Double {
+        let currentMonth = Calendar.current.component(.month, from: Date())
+        let currentYear = Calendar.current.component(.year, from: Date())
+        
+        return transactions
+            .filter { txn in
+                guard let cat = txn.category, cat.id == categoryID else { return false }
+                let month = Calendar.current.component(.month, from: txn.date)
+                let year = Calendar.current.component(.year, from: txn.date)
+                return month == currentMonth && year == currentYear
+            }
+            .reduce(0) { $0 + $1.amount }
+    }
+    
+    private var remainingAmount: Double {
+        max(plannedAmount - spentAmount, 0)
+    }
+    
+    private var progress: Double {
+        guard plannedAmount > 0 else { return 0 }
+        return min(spentAmount / plannedAmount, 1.0)
+    }
+    
+    private var percentageText: String {
+        guard plannedAmount > 0 else { return "No budget set" }
+        let percent = Int((spentAmount / plannedAmount) * 100)
+        return "\(percent)% of budget used"
+    }
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            
+            // Main Card Background
+            VStack(alignment: .leading, spacing: 12) {
+                
+                // Dropdown Menu to change category
+                Menu {
+                    ForEach(categories) { category in
+                        Button(category.name) {
+                            onChangeCategory(category)
+                        }
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(currentCategory?.name ?? "Select")
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+                        
+                        Image(systemName: "chevron.up.chevron.down")
+                            .font(.caption2)
+                            .foregroundStyle(.blue)
+                    }
+                }
+                
+                // Amounts Row
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Spent")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        MoneyText(amount: spentAmount)
+                            .font(.subheadline)
+                            .bold()
+                            .foregroundStyle(.red)
+                    }
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Text("Remaining")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        MoneyText(amount: remainingAmount)
+                            .font(.subheadline)
+                            .bold()
+                            .foregroundStyle(.green)
+                    }
+                }
+                
+                // Progress Bar
+                VStack(alignment: .leading, spacing: 6) {
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(Color.gray.opacity(0.2))
+                            
+                            Capsule()
+                                .fill(progress >= 1.0 ? Color.red : Color.blue)
+                                .frame(width: geo.size.width * CGFloat(progress))
+                        }
+                    }
+                    .frame(height: 6)
+                    
+                    Text(percentageText)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(16)
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
+            
+            // Delete Overlay (Only visible in Edit Mode)
+            if isEditing {
+                Button {
+                    onRemove()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(.white, .red)
+                        .background(Circle().fill(Color.white))
+                }
+                .offset(x: -8, y: -8) // Pulls the button slightly outside the top-left corner
+            }
+        }
+        // The Wiggle Animation!
+        .rotationEffect(.degrees(isEditing ? wigglePhase : 0))
+        .onChange(of: isEditing) { _, editing in
+            if editing {
+                withAnimation(.easeInOut(duration: 0.12).repeatForever(autoreverses: true)) {
+                    wigglePhase = 1.5
+                }
+            } else {
+                withAnimation { wigglePhase = 0 }
+            }
+        }
+        .onAppear {
+            // Give it a slightly randomized start if it appears while already editing
+            if isEditing { wigglePhase = -1.5 }
+        }
+    }
 }

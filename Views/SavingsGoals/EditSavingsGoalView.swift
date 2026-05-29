@@ -46,11 +46,9 @@ struct EditSavingsGoalView: View {
                 Section("Goal Details") {
                     TextField("Goal Name", text: $title)
                     
-                    TextField("Target Amount", value: $targetAmount, format: .number)
-                        .keyboardType(.decimalPad)
+                    SmartDecimalField("Target Amount", value: $targetAmount)
                     
-                    TextField("Currently Saved", value: $currentAmount, format: .number)
-                        .keyboardType(.decimalPad)
+                    SmartDecimalField("Already Saved (Optional)", value: $currentAmount)
                 }
                 
                 Section("Timeline") {

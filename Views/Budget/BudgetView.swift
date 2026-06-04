@@ -12,6 +12,10 @@ struct BudgetView: View {
     
     @Environment(\.modelContext) private var modelContext
     
+    // Bring in the App Group currency preference to format the alert text
+    @AppStorage("selectedCurrencyCode", store: UserDefaults(suiteName: "group.com.ariane.Financio"))
+    private var selectedCurrencyCode = "USD"
+    
     @Query private var budgets: [Budget]
     @Query private var transactions: [BudgetTransaction]
     
@@ -24,7 +28,6 @@ struct BudgetView: View {
     @State private var selectedYear = Calendar.current.component(.year, from: Date())
     
     // 1. INJECT THE VIEW MODEL
-    // We instantiate the ViewModel on the fly, passing in our raw data and current UI state.
     private var viewModel: BudgetViewModel {
         BudgetViewModel(
             budgets: budgets,
@@ -125,8 +128,9 @@ struct BudgetView: View {
             .sheet(item: $selectedBudget) { budget in
                 EditBudgetView(budget: budget)
             }
-            .confirmationDialog(
-                "Delete this budget?",
+            // CHANGED: Replaced confirmationDialog with native alert & dynamic title
+            .alert(
+                deleteAlertTitle,
                 isPresented: Binding(
                     get: { budgetPendingDeletion != nil },
                     set: { newValue in
@@ -134,21 +138,19 @@ struct BudgetView: View {
                             budgetPendingDeletion = nil
                         }
                     }
-                ),
-                titleVisibility: .visible
+                )
             ) {
-                Button("Delete Budget", role: .destructive) {
+                Button("Cancel", role: .cancel) {
+                    budgetPendingDeletion = nil
+                }
+                Button("Delete", role: .destructive) {
                     if let budgetPendingDeletion {
                         deleteBudget(budgetPendingDeletion)
                         self.budgetPendingDeletion = nil
                     }
                 }
-                
-                Button("Cancel", role: .cancel) {
-                    budgetPendingDeletion = nil
-                }
             } message: {
-                Text("This will permanently remove the budget entry for the selected month.")
+                Text("This will permanently remove the budget entry for the selected month. This action cannot be undone.")
             }
         }
     }
@@ -162,7 +164,6 @@ struct BudgetView: View {
             
             // Top Row: Category Name & Icon
             HStack {
-                // If you have icon/color data in the Category, you can add the colored icon here!
                 if let category = budget.category {
                     Image(systemName: category.iconName)
                         .foregroundStyle(Color(hex: category.colorHex))
@@ -241,6 +242,14 @@ struct BudgetView: View {
     }
     
     // MARK: - Logic
+    
+    // Computes the dynamic alert title with perfectly formatted currency
+    private var deleteAlertTitle: String {
+        guard let budget = budgetPendingDeletion else { return "Delete Budget?" }
+        let formattedAmount = budget.plannedAmount.formatted(.currency(code: selectedCurrencyCode))
+        let categoryName = budget.category?.name ?? "Unknown Category"
+        return "Delete \(categoryName) (\(formattedAmount))?"
+    }
     
     private func goToPreviousMonth() {
         if selectedMonth == 1 {

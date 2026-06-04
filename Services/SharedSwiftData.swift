@@ -37,6 +37,7 @@ struct SharedSwiftData {
             
             // 3. Define the exact file path for the database inside the shared folder
             let databaseURL = sharedURL.appendingPathComponent("FinancioShared.sqlite")
+            
             let configuration = ModelConfiguration(url: databaseURL)
             
             // 4. Initialize and return the container

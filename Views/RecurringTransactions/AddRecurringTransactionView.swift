@@ -17,7 +17,7 @@ struct AddRecurringTransactionView: View {
     @Query(sort: \Category.name) private var categories: [Category]
     
     @State private var title = ""
-    @State private var amount = 0.0
+    @State private var amount = 0.0 // Restored for SmartDecimalField
     @State private var selectedType: TransactionType = .expense
     @State private var selectedFrequency: RecurringFrequency = .monthly
     @State private var nextDate = Date()
@@ -39,6 +39,7 @@ struct AddRecurringTransactionView: View {
                         }
                     }
                     
+                    // Restored your custom component!
                     SmartDecimalField("Amount", value: $amount)
 
                     Picker("Frequency", selection: $selectedFrequency) {
@@ -55,22 +56,28 @@ struct AddRecurringTransactionView: View {
                 }
                 
                 Section("Accounts") {
-                    // Source account remains restricted to usable money
                     Picker("Account", selection: $selectedAccount) {
                         Text("Select an account").tag(Account?.none)
                         
                         ForEach(usableActiveAccounts) { account in
-                            Text(account.name).tag(Optional(account))
+                            let archiveTag = account.isArchived ? " [Archived]" : ""
+                            let groupTag = account.group.map { " (\($0.name))" } ?? ""
+                            
+                            (Text(account.name + archiveTag) + Text(groupTag).foregroundStyle(.secondary))
+                                .tag(Optional(account))
                         }
                     }
                     
                     if selectedType == .transfer {
-                        // NEW: Destination account can be ANY active account
                         Picker("To Account", selection: $selectedToAccount) {
                             Text("Select destination").tag(Account?.none)
                             
                             ForEach(activeAccounts) { account in
-                                Text(account.name).tag(Optional(account))
+                                let archiveTag = account.isArchived ? " [Archived]" : ""
+                                let groupTag = account.group.map { " (\($0.name))" } ?? ""
+                                
+                                (Text(account.name + archiveTag) + Text(groupTag).foregroundStyle(.secondary))
+                                    .tag(Optional(account))
                             }
                         }
                     }
@@ -124,17 +131,14 @@ struct AddRecurringTransactionView: View {
         }
     }
     
-    // All active accounts (used for transfers)
     private var activeAccounts: [Account] {
         accounts.filter { !$0.isArchived }
     }
     
-    // Only Checking or Credit Card (used for the source of funds)
     private var usableActiveAccounts: [Account] {
         accounts.filter { !$0.isArchived && ($0.type == .checking || $0.type == .creditCard) }
     }
     
-    // Filters categories to match the selected transaction type.
     private var filteredCategories: [Category] {
         switch selectedType {
         case .income:
@@ -150,7 +154,6 @@ struct AddRecurringTransactionView: View {
         }
     }
     
-    // Validates the recurring transaction form.
     private var isFormValid: Bool {
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         
@@ -171,7 +174,6 @@ struct AddRecurringTransactionView: View {
         }
     }
     
-    // Saves the recurring rule to SwiftData.
     private func saveRecurringTransaction() {
         guard isFormValid else { return }
         
@@ -191,8 +193,4 @@ struct AddRecurringTransactionView: View {
         modelContext.insert(newRecurringTransaction)
         dismiss()
     }
-}
-
-#Preview {
-    AddRecurringTransactionView()
 }

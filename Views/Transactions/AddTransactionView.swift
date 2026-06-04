@@ -52,7 +52,8 @@ struct AddTransactionView: View {
                             }
                         }
                     
-                    SmartDecimalField("Amount", value: $amount)
+                    TextField("Amount", value: $amount, format: .number)
+                        .keyboardType(.decimalPad)
                     
                     DatePicker("Date", selection: $date, displayedComponents: .date)
                     
@@ -62,16 +63,33 @@ struct AddTransactionView: View {
                 Section("Accounts") {
                     Picker("From Account", selection: $selectedAccount) {
                         Text("Select account").tag(Account?.none)
+                        
                         ForEach(activeAccounts) { account in
-                            Text(account.name).tag(Optional(account))
+                            // 1. Check if the account is archived
+                            let archiveTag = account.isArchived ? " [Archived]" : ""
+                            
+                            // 2. Safely read the relationship!
+                            // If the account has a group, format it. Otherwise, return an empty string.
+                            let groupTag = account.group.map { " (\($0.name))" } ?? ""
+                            
+                            // 3. The Concatenated UI
+                            (Text(account.name + archiveTag) + Text(groupTag).foregroundStyle(.secondary))
+                                .tag(Optional(account))
                         }
                     }
                     
                     if selectedType == .transfer {
                         Picker("To Account", selection: $selectedToAccount) {
                             Text("Select destination").tag(Account?.none)
+                            
                             ForEach(activeAccounts) { account in
-                                Text(account.name).tag(Optional(account))
+                                let archiveTag = account.isArchived ? " [Archived]" : ""
+                                
+                                // Same safe relationship check here
+                                let groupTag = account.group.map { " (\($0.name))" } ?? ""
+                                
+                                (Text(account.name + archiveTag) + Text(groupTag).foregroundStyle(.secondary))
+                                    .tag(Optional(account))
                             }
                         }
                     }

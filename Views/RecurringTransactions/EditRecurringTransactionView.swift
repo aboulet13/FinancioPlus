@@ -54,6 +54,7 @@ struct EditRecurringTransactionView: View {
                         }
                     }
                     
+                    // Kept your custom SmartDecimalField!
                     SmartDecimalField("Amount", value: $amount)
                     
                     Picker("Frequency", selection: $selectedFrequency) {
@@ -73,16 +74,27 @@ struct EditRecurringTransactionView: View {
                     Picker("Account", selection: $selectedAccount) {
                         Text("Select an account").tag(Account?.none)
                         ForEach(usableActiveAccounts) { account in
-                            Text(account.name).tag(Optional(account))
+                            
+                            // NEW: Account Group Concatenation
+                            let archiveTag = account.isArchived ? " [Archived]" : ""
+                            let groupTag = account.group.map { " (\($0.name))" } ?? ""
+                            
+                            (Text(account.name + archiveTag) + Text(groupTag).foregroundStyle(.secondary))
+                                .tag(Optional(account))
                         }
                     }
                     
                     if selectedType == .transfer {
-                        // NEW: Destination account can be ANY active account
                         Picker("To Account", selection: $selectedToAccount) {
                             Text("Select destination").tag(Account?.none)
                             ForEach(activeAccounts) { account in
-                                Text(account.name).tag(Optional(account))
+                                
+                                // NEW: Account Group Concatenation
+                                let archiveTag = account.isArchived ? " [Archived]" : ""
+                                let groupTag = account.group.map { " (\($0.name))" } ?? ""
+                                
+                                (Text(account.name + archiveTag) + Text(groupTag).foregroundStyle(.secondary))
+                                    .tag(Optional(account))
                             }
                         }
                     }
@@ -124,13 +136,22 @@ struct EditRecurringTransactionView: View {
         }
     }
     
-    // NEW: All active accounts (used for transfers)
+    // MARK: - Logic & Helpers
+    
     private var activeAccounts: [Account] {
-        accounts.filter { !$0.isArchived }
+        var result = accounts.filter { !$0.isArchived }
+        if let selectedTo = selectedToAccount, selectedTo.isArchived, !result.contains(where: { $0.id == selectedTo.id }) {
+            result.append(selectedTo)
+        }
+        return result.sorted { $0.name < $1.name }
     }
     
     private var usableActiveAccounts: [Account] {
-        accounts.filter { !$0.isArchived && ($0.type == .checking || $0.type == .creditCard) }
+        var result = accounts.filter { !$0.isArchived && ($0.type == .checking || $0.type == .creditCard) }
+        if let selected = selectedAccount, selected.isArchived, !result.contains(where: { $0.id == selected.id }) {
+            result.append(selected)
+        }
+        return result.sorted { $0.name < $1.name }
     }
     
     private var filteredCategories: [Category] {
@@ -156,6 +177,7 @@ struct EditRecurringTransactionView: View {
     
     private func updateRecurringTransaction() {
         guard isFormValid else { return }
+        
         recurringTransaction.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
         recurringTransaction.amount = amount
         recurringTransaction.type = selectedType
@@ -166,6 +188,7 @@ struct EditRecurringTransactionView: View {
         recurringTransaction.toAccount = selectedType == .transfer ? selectedToAccount : nil
         recurringTransaction.category = selectedType == .transfer ? nil : selectedCategory
         recurringTransaction.isActive = isActive
+        
         dismiss()
     }
 }

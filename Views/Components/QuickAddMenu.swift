@@ -9,39 +9,52 @@ import SwiftUI
 
 struct QuickAddMenu: View {
     
-    // Tap into our global manager
-    @Environment(SheetManager.self) private var sheetManager
+    // 1. LOCAL STATE TOGGLES (Self-Contained Routing)
+    @State private var showingAddTransaction = false
+    @State private var showingAddAccount = false
+    @State private var showingAddBudget = false
+    @State private var showingAddSavingsGoal = false
+    @State private var showingAddRecurring = false
+    
+    // We need these because AddBudgetView requires a time context!
+    private let currentMonth = Calendar.current.component(.month, from: Date())
+    private let currentYear = Calendar.current.component(.year, from: Date())
     
     var body: some View {
         Menu {
             Button {
-                sheetManager.activeSheet = .transaction
+                HapticManager.playImpact(style: .light)
+                showingAddTransaction = true
             } label: {
                 Label("Add Transaction", systemImage: "dollarsign.circle")
             }
             
             Button {
-                sheetManager.activeSheet = .account
+                HapticManager.playImpact(style: .light)
+                showingAddAccount = true
             } label: {
                 Label("Add Account", systemImage: "building.columns")
             }
             
-            Divider()
+            Divider() // Visual separator
             
             Button {
-                sheetManager.activeSheet = .budget
+                HapticManager.playImpact(style: .light)
+                showingAddBudget = true
             } label: {
                 Label("Add Budget", systemImage: "chart.bar")
             }
             
             Button {
-                sheetManager.activeSheet = .savingsGoal
+                HapticManager.playImpact(style: .light)
+                showingAddSavingsGoal = true
             } label: {
                 Label("Add Savings Goal", systemImage: "target")
             }
             
             Button {
-                sheetManager.activeSheet = .recurringTransaction
+                HapticManager.playImpact(style: .light)
+                showingAddRecurring = true
             } label: {
                 Label("Add Recurring Bill", systemImage: "arrow.2.squarepath")
             }
@@ -53,5 +66,27 @@ struct QuickAddMenu: View {
                 .foregroundStyle(Color.accentColor)
                 .symbolRenderingMode(.hierarchical) // Gives it a premium translucent look
         }
+        
+        // 2. THE SHEET LISTENERS
+        .sheet(isPresented: $showingAddTransaction) {
+            AddTransactionView()
+        }
+        .sheet(isPresented: $showingAddAccount) {
+            AddAccountView()
+        }
+        .sheet(isPresented: $showingAddBudget) {
+            // Injecting the date context safely!
+            AddBudgetView(month: currentMonth, year: currentYear)
+        }
+        .sheet(isPresented: $showingAddSavingsGoal) {
+            AddSavingsGoalView()
+        }
+        .sheet(isPresented: $showingAddRecurring) {
+            AddRecurringTransactionView()
+        }
     }
+}
+
+#Preview {
+    QuickAddMenu()
 }

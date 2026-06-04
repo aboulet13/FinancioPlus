@@ -14,7 +14,6 @@ struct AccountsListView: View {
     
     // 1. FETCH RAW DATA
     @Query(sort: \Account.name) private var accounts: [Account]
-    
     @Query(sort: \AccountGroup.name) private var accountGroups: [AccountGroup]
     
     @State private var isShowingAddAccount = false
@@ -43,13 +42,12 @@ struct AccountsListView: View {
                     )
                 } else {
                     List {
-                        // NEW: Net Worth Hero Card placed at the top of the list!
                         netWorthCard
-                            .listRowInsets(EdgeInsets()) // Removes default list padding
-                            .listRowBackground(Color.clear) // Makes it look like a floating card
-                            .listRowSeparator(.hidden) // Removes the list line under the card
+                            .listRowInsets(EdgeInsets())
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
                             .padding(.bottom, 8)
-                            .padding(.horizontal) // Add horizontal padding back to match inset lists
+                            .padding(.horizontal)
                         
                         // 1. GROUPED ACTIVE ACCOUNTS
                         ForEach(accountGroups) { group in
@@ -59,7 +57,7 @@ struct AccountsListView: View {
                                 Section {
                                     ForEach(groupAccounts) { account in
                                         accountRow(for: account)
-                                            .swipeActions(edge: .trailing) {
+                                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                                 activeSwipeActions(for: account)
                                             }
                                     }
@@ -86,7 +84,7 @@ struct AccountsListView: View {
                             Section {
                                 ForEach(ungroupedActiveAccounts) { account in
                                     accountRow(for: account)
-                                        .swipeActions(edge: .trailing) {
+                                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                             activeSwipeActions(for: account)
                                         }
                                 }
@@ -103,7 +101,7 @@ struct AccountsListView: View {
                             Section("Archived Accounts") {
                                 ForEach(viewModel.archivedAccounts) { account in
                                     accountRow(for: account)
-                                        .swipeActions(edge: .trailing) {
+                                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                             archivedSwipeActions(for: account)
                                         }
                                 }
@@ -128,43 +126,43 @@ struct AccountsListView: View {
             .sheet(item: $selectedAccount) { account in
                 EditAccountView(account: account)
             }
-            .confirmationDialog(
-                "Archive this account?",
+            // MODIFIED: Injects the dynamic Archive Title
+            .alert(
+                archiveAlertTitle,
                 isPresented: Binding(
                     get: { accountPendingArchive != nil },
                     set: { newValue in
                         if newValue == false { accountPendingArchive = nil }
                     }
-                ),
-                titleVisibility: .visible
+                )
             ) {
-                Button("Archive Account", role: .destructive) {
+                Button("Cancel", role: .cancel) { accountPendingArchive = nil }
+                Button("Archive") {
                     if let accountPendingArchive {
                         archiveAccount(accountPendingArchive)
                         self.accountPendingArchive = nil
                     }
                 }
-                Button("Cancel", role: .cancel) { accountPendingArchive = nil }
             } message: {
                 Text("Archived accounts are hidden from active lists, excluded from total balance, and unavailable for new transactions.")
             }
-            .confirmationDialog(
-                "Permanently delete this account?",
+            // MODIFIED: Injects the dynamic Delete Title
+            .alert(
+                deleteAlertTitle,
                 isPresented: Binding(
                     get: { accountPendingDelete != nil },
                     set: { newValue in
                         if newValue == false { accountPendingDelete = nil }
                     }
-                ),
-                titleVisibility: .visible
+                )
             ) {
-                Button("Delete Account", role: .destructive) {
+                Button("Cancel", role: .cancel) { accountPendingDelete = nil }
+                Button("Delete", role: .destructive) {
                     if let accountPendingDelete {
                         deleteAccount(accountPendingDelete)
                         self.accountPendingDelete = nil
                     }
                 }
-                Button("Cancel", role: .cancel) { accountPendingDelete = nil }
             } message: {
                 Text("Deleting this account will permanently remove it from your database. This action cannot be undone.")
             }
@@ -173,7 +171,6 @@ struct AccountsListView: View {
     
     // MARK: - UI Components
     
-    // NEW: The migrated Net Worth Card
     private var netWorthCard: some View {
         VStack(alignment: .leading, spacing: 16) {
             
@@ -237,7 +234,6 @@ struct AccountsListView: View {
     }
     
     // MARK: - Net Worth Calculations
-    // Brought over from the Dashboard to keep this view perfectly standalone
     
     private var calculatedNetWorth: Double {
         let active = accounts.filter { !$0.isArchived }
@@ -314,6 +310,20 @@ struct AccountsListView: View {
             selectedAccount = account
         }
         .opacity(account.isArchived ? 0.6 : 1.0)
+    }
+    
+    // MARK: - Dynamic Alert Titles
+    
+    private var archiveAlertTitle: String {
+        guard let account = accountPendingArchive else { return "Archive Account?" }
+        let groupTag = account.group.map { " (\($0.name))" } ?? ""
+        return "Archive \(account.name)\(groupTag)?"
+    }
+    
+    private var deleteAlertTitle: String {
+        guard let account = accountPendingDelete else { return "Permanently delete account?" }
+        let groupTag = account.group.map { " (\($0.name))" } ?? ""
+        return "Permanently delete \(account.name)\(groupTag)?"
     }
     
     // MARK: - Database Actions

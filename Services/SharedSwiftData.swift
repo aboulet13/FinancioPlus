@@ -5,7 +5,6 @@
 //  Created by Ariane on 16/05/2026.
 //
 
-
 import Foundation
 import SwiftData
 
@@ -28,7 +27,6 @@ struct SharedSwiftData {
             ])
             
             // 2. Point to the shared App Group folder
-            // REPLACE "group.com.yourname.Financio" with the exact App Group ID you created!
             let appGroupIdentifier = "group.com.ariane.Financio"
             
             guard let sharedURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier) else {
@@ -37,6 +35,11 @@ struct SharedSwiftData {
             
             // 3. Define the exact file path for the database inside the shared folder
             let databaseURL = sharedURL.appendingPathComponent("FinancioShared.sqlite")
+            
+            // 🚨 TEMPORARY NUKE LINES - ADD THESE 🚨
+            //try? FileManager.default.removeItem(at: databaseURL)
+            //try? FileManager.default.removeItem(at: sharedURL.appendingPathComponent("FinancioShared.sqlite-wal"))
+            //try? FileManager.default.removeItem(at: sharedURL.appendingPathComponent("FinancioShared.sqlite-shm"))
             
             let configuration = ModelConfiguration(url: databaseURL)
             

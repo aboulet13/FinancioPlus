@@ -11,10 +11,8 @@ import SwiftData
 struct BudgetView: View {
     
     @Environment(\.modelContext) private var modelContext
-    
-    // Bring in the App Group currency preference to format the alert text
     @AppStorage("selectedCurrencyCode", store: UserDefaults(suiteName: "group.com.ariane.Financio"))
-    private var selectedCurrencyCode = "USD"
+    private var selectedCurrencyCode = "EUR"
     
     @Query private var budgets: [Budget]
     @Query private var transactions: [BudgetTransaction]
@@ -23,11 +21,9 @@ struct BudgetView: View {
     @State private var selectedBudget: Budget?
     @State private var budgetPendingDeletion: Budget?
     
-    // UI State: Tracks which month the user is currently looking at.
     @State private var selectedMonth = Calendar.current.component(.month, from: Date())
     @State private var selectedYear = Calendar.current.component(.year, from: Date())
     
-    // 1. INJECT THE VIEW MODEL
     private var viewModel: BudgetViewModel {
         BudgetViewModel(
             budgets: budgets,
@@ -41,7 +37,6 @@ struct BudgetView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 
-                // Month Navigation Header
                 HStack {
                     Button {
                         withAnimation { goToPreviousMonth() }
@@ -53,10 +48,9 @@ struct BudgetView: View {
                     
                     Spacer()
                     
-                    Text(viewModel.monthYearTitle) // Purely driven by ViewModel
+                    Text(viewModel.monthYearTitle)
                         .font(.headline)
                         .bold()
-                        // This modifier makes the text transition smoothly when changing months
                         .contentTransition(.numericText())
                     
                     Spacer()
@@ -87,22 +81,10 @@ struct BudgetView: View {
                             LazyVStack(spacing: 16) {
                                 ForEach(viewModel.selectedMonthBudgets) { budget in
                                     budgetCard(for: budget)
-                                        .onTapGesture {
-                                            selectedBudget = budget
-                                        }
-                                        // We use contextMenu here since we aren't using a standard List anymore
+                                        .onTapGesture { selectedBudget = budget }
                                         .contextMenu {
-                                            Button {
-                                                selectedBudget = budget
-                                            } label: {
-                                                Label("Edit Budget", systemImage: "pencil")
-                                            }
-                                            
-                                            Button(role: .destructive) {
-                                                budgetPendingDeletion = budget
-                                            } label: {
-                                                Label("Delete Budget", systemImage: "trash")
-                                            }
+                                            Button { selectedBudget = budget } label: { Label("Edit Budget", systemImage: "pencil") }
+                                            Button(role: .destructive) { budgetPendingDeletion = budget } label: { Label("Delete Budget", systemImage: "trash") }
                                         }
                                 }
                             }
@@ -115,11 +97,7 @@ struct BudgetView: View {
             .navigationTitle("Budgets")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        isShowingAddBudget = true
-                    } label: {
-                        Label("Add Budget", systemImage: "plus")
-                    }
+                    Button { isShowingAddBudget = true } label: { Label("Add Budget", systemImage: "plus") }
                 }
             }
             .sheet(isPresented: $isShowingAddBudget) {
@@ -128,21 +106,14 @@ struct BudgetView: View {
             .sheet(item: $selectedBudget) { budget in
                 EditBudgetView(budget: budget)
             }
-            // CHANGED: Replaced confirmationDialog with native alert & dynamic title
             .alert(
                 deleteAlertTitle,
                 isPresented: Binding(
                     get: { budgetPendingDeletion != nil },
-                    set: { newValue in
-                        if newValue == false {
-                            budgetPendingDeletion = nil
-                        }
-                    }
+                    set: { newValue in if newValue == false { budgetPendingDeletion = nil } }
                 )
             ) {
-                Button("Cancel", role: .cancel) {
-                    budgetPendingDeletion = nil
-                }
+                Button("Cancel", role: .cancel) { budgetPendingDeletion = nil }
                 Button("Delete", role: .destructive) {
                     if let budgetPendingDeletion {
                         deleteBudget(budgetPendingDeletion)
@@ -152,17 +123,18 @@ struct BudgetView: View {
             } message: {
                 Text("This will permanently remove the budget entry for the selected month. This action cannot be undone.")
             }
+            .onAppear {
+                // Ensure rollovers happen on the current month as soon as the view opens
+                autoRolloverBudgets(toMonth: selectedMonth, toYear: selectedYear)
+            }
         }
     }
     
     // MARK: - UI Components
     
-    // Upgraded Budget Card Design
     @ViewBuilder
     private func budgetCard(for budget: Budget) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            
-            // Top Row: Category Name & Icon
             HStack {
                 if let category = budget.category {
                     Image(systemName: category.iconName)
@@ -175,13 +147,19 @@ struct BudgetView: View {
                 Text(budget.category?.name ?? "Unknown Category")
                     .font(.headline)
                 
+                // NEW: Visual indicator that a budget is recurring
+                if budget.isRecurring {
+                    Image(systemName: "repeat")
+                        .font(.caption)
+                        .foregroundStyle(.blue)
+                }
+                
                 Spacer()
                 
                 Image(systemName: "ellipsis")
                     .foregroundStyle(.tertiary)
             }
             
-            // Middle Row: Financial Breakdown
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Planned")
@@ -191,9 +169,7 @@ struct BudgetView: View {
                         .font(.subheadline)
                         .bold()
                 }
-                
                 Spacer()
-                
                 VStack(alignment: .center, spacing: 4) {
                     Text("Spent")
                         .font(.caption)
@@ -202,9 +178,7 @@ struct BudgetView: View {
                         .font(.subheadline)
                         .foregroundStyle(.red)
                 }
-                
                 Spacer()
-                
                 VStack(alignment: .trailing, spacing: 4) {
                     Text("Remaining")
                         .font(.caption)
@@ -216,20 +190,16 @@ struct BudgetView: View {
                 }
             }
             
-            // Bottom Row: Progress Bar
             VStack(alignment: .leading, spacing: 6) {
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
-                        Capsule()
-                            .fill(Color.gray.opacity(0.2))
-                        
+                        Capsule().fill(Color.gray.opacity(0.2))
                         Capsule()
                             .fill(viewModel.progressColor(for: budget))
                             .frame(width: geo.size.width * CGFloat(viewModel.progressValue(for: budget)))
                     }
                 }
                 .frame(height: 8)
-                
                 Text(viewModel.progressText(for: budget))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
@@ -243,7 +213,37 @@ struct BudgetView: View {
     
     // MARK: - Logic
     
-    // Computes the dynamic alert title with perfectly formatted currency
+    // NEW: The Auto-Rollover Engine!
+    private func autoRolloverBudgets(toMonth: Int, toYear: Int) {
+        // Find what the "Previous" month was
+        var prevMonth = toMonth - 1
+        var prevYear = toYear
+        if prevMonth == 0 {
+            prevMonth = 12
+            prevYear -= 1
+        }
+        
+        // Find recurring budgets from the previous month
+        let recurringToRoll = budgets.filter { $0.month == prevMonth && $0.year == prevYear && $0.isRecurring }
+        let existingTargetBudgets = budgets.filter { $0.month == toMonth && $0.year == toYear }
+        
+        for oldBudget in recurringToRoll {
+            // Only roll it over if the user hasn't already made a budget for this category this month
+            let alreadyExists = existingTargetBudgets.contains { $0.category?.id == oldBudget.category?.id }
+            
+            if !alreadyExists {
+                let newBudget = Budget(
+                    month: toMonth,
+                    year: toYear,
+                    plannedAmount: oldBudget.plannedAmount,
+                    category: oldBudget.category,
+                    isRecurring: true // Keep the chain going!
+                )
+                modelContext.insert(newBudget)
+            }
+        }
+    }
+    
     private var deleteAlertTitle: String {
         guard let budget = budgetPendingDeletion else { return "Delete Budget?" }
         let formattedAmount = budget.plannedAmount.formatted(.currency(code: selectedCurrencyCode))
@@ -258,6 +258,8 @@ struct BudgetView: View {
         } else {
             selectedMonth -= 1
         }
+        // Trigger Rollover check!
+        autoRolloverBudgets(toMonth: selectedMonth, toYear: selectedYear)
     }
     
     private func goToNextMonth() {
@@ -267,6 +269,8 @@ struct BudgetView: View {
         } else {
             selectedMonth += 1
         }
+        // Trigger Rollover check!
+        autoRolloverBudgets(toMonth: selectedMonth, toYear: selectedYear)
     }
     
     private func deleteBudget(_ budget: Budget) {

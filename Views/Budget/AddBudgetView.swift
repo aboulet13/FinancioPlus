@@ -20,7 +20,8 @@ struct AddBudgetView: View {
     let year: Int
     
     @State private var selectedCategory: Category?
-    @State private var plannedAmount = 0.0 // Restored for SmartDecimalField
+    @State private var plannedAmount = 0.0
+    @State private var isRecurring = false // NEW: Form state
     
     var body: some View {
         NavigationStack {
@@ -28,14 +29,15 @@ struct AddBudgetView: View {
                 Section("Budget Details") {
                     Picker("Category", selection: $selectedCategory) {
                         Text("Select a category").tag(Category?.none)
-                        
                         ForEach(expenseCategories) { category in
                             Text(category.name).tag(Optional(category))
                         }
                     }
                     
-                    // Restored your custom component!
                     SmartDecimalField("Planned Amount", value: $plannedAmount)
+                    
+                    // NEW: The Toggle
+                    Toggle("Repeat Monthly", isOn: $isRecurring)
                 }
                 
                 if selectedCategory != nil && duplicateBudgetExists {
@@ -60,25 +62,14 @@ struct AddBudgetView: View {
         }
     }
     
-    private var expenseCategories: [Category] {
-        categories.filter { $0.kind == CategoryKind.expense }
-    }
+    private var expenseCategories: [Category] { categories.filter { $0.kind == CategoryKind.expense } }
     
     private var duplicateBudgetExists: Bool {
         guard let selectedCategory else { return false }
-        
-        return budgets.contains { budget in
-            budget.month == month &&
-            budget.year == year &&
-            budget.category?.id == selectedCategory.id
-        }
+        return budgets.contains { $0.month == month && $0.year == year && $0.category?.id == selectedCategory.id }
     }
     
-    private var isFormValid: Bool {
-        selectedCategory != nil &&
-        plannedAmount > 0 &&
-        !duplicateBudgetExists
-    }
+    private var isFormValid: Bool { selectedCategory != nil && plannedAmount > 0 && !duplicateBudgetExists }
     
     private func saveBudget() {
         guard let selectedCategory else { return }
@@ -87,7 +78,8 @@ struct AddBudgetView: View {
             month: month,
             year: year,
             plannedAmount: plannedAmount,
-            category: selectedCategory
+            category: selectedCategory,
+            isRecurring: isRecurring // NEW: Save it!
         )
         
         modelContext.insert(newBudget)

@@ -13,50 +13,54 @@ struct DashboardView: View {
     
     @Environment(\.modelContext) private var modelContext
     
+    // We bring in the currency preference for formatting
+    @AppStorage("selectedCurrencyCode", store: UserDefaults(suiteName: "group.com.ariane.Financio"))
+    private var selectedCurrencyCode = "EUR"
+    
+    @AppStorage("weeklyDiscretionaryLimit") private var weeklyLimit: Double = 50.0
+    
     // 1. FETCH DATA
     @Query private var accounts: [Account]
-    // We fetch BudgetTransaction (as named in your repo) instead of Transaction
     @Query(sort: \BudgetTransaction.date, order: .reverse) private var transactions: [BudgetTransaction]
     
-    // We need Categories and Budgets to calculate the card data
     @Query(sort: \Category.name) private var categories: [Category]
     @Query private var budgets: [Budget]
     
     // 2. INJECT INTO VIEWMODEL
     @State private var viewModel = DashboardViewModel()
     
-    // 3. UI PREFERENCES (The Dashboard Layout)
-    // We store a comma-separated string of Category UUIDs. This avoids altering our SwiftData schema!
+    // 3. UI PREFERENCES
     @AppStorage("pinnedBudgetCards") private var pinnedBudgetCardsString: String = ""
     
-    // Tracks whether the user is long-pressing to delete cards
     @State private var isEditingBudgets: Bool = false
+    @State private var isEditingWeeklyLimit: Bool = false
+    @State private var newWeeklyLimitString: String = ""
     
-    // A computed property that safely translates our AppStorage string into an array of UUIDs
-    // (Notice there is no 'set' block here to keep Swift's immutability rules happy)
     private var pinnedCategoryIDs: [UUID] {
         pinnedBudgetCardsString.split(separator: ",").compactMap { UUID(uuidString: String($0)) }
     }
     
     var body: some View {
         NavigationStack {
-            // A ScrollView with a subtle background color allows white cards to "pop"
             ScrollView {
                 VStack(spacing: 16) {
                     
-                    // 1. HERO SECTION: Cash Flow (Moved to the top!)
+                    // 1. WEEKLY PULSE HERO CARD
+                    weeklyPulseCard
+                    
+                    // 2. HERO SECTION: Cash Flow (Updated!)
                     cashFlowCard
                     
-                    // 2. NEW: BUDGET GRID SECTION
+                    // 3. BUDGET GRID SECTION
                     budgetsSection
                     
-                    // 3. GRAPH SPACE: Scrollable Cards (Line & Donut)
+                    // 4. GRAPH SPACE: Scrollable Cards (Line & Donut)
                     scrollableChartsSection
                     
-                    // 4. CHART SECTION: Displays asset allocation distribution
+                    // 5. CHART SECTION: Displays asset allocation distribution
                     assetAllocationCard
                     
-                    // 5. ACTION CENTER: Savings & Reports
+                    // 6. ACTION CENTER: Savings & Reports
                     actionCenterCard
                     
                 }
@@ -80,25 +84,157 @@ struct DashboardView: View {
             .onChange(of: transactions) { _, newTransactions in
                 viewModel.transactions = newTransactions
             }
-            // Tap anywhere on the background to exit "Edit Mode"
             .onTapGesture {
                 if isEditingBudgets {
                     withAnimation { isEditingBudgets = false }
                 }
             }
+            .alert("Set Weekly Limit", isPresented: $isEditingWeeklyLimit) {
+                TextField("Amount", text: $newWeeklyLimitString)
+                    .keyboardType(.decimalPad)
+                Button("Cancel", role: .cancel) { }
+                Button("Save") {
+                    if let newLimit = Double(newWeeklyLimitString.replacingOccurrences(of: ",", with: ".")) {
+                        weeklyLimit = newLimit
+                    }
+                }
+            } message: {
+                Text("Enter the maximum amount you want to spend this week.")
+            }
         }
+    }
+    
+    // MARK: - Dashboard Math & Data
+    
+    private var spentThisWeek: Double {
+        let calendar = Calendar.current
+        let now = Date()
+        guard let weekInterval = calendar.dateInterval(of: .weekOfYear, for: now) else { return 0 }
+        
+        return transactions.filter { txn in
+            txn.type == .expense && weekInterval.contains(txn.date)
+        }.reduce(0) { $0 + $1.amount }
+    }
+    
+    // NEW: Calculate transfers to Savings this month
+    private var savedThisMonth: Double {
+        let calendar = Calendar.current
+        let currentMonth = calendar.component(.month, from: Date())
+        let currentYear = calendar.component(.year, from: Date())
+        
+        return transactions.filter { txn in
+            let isThisMonth = calendar.component(.month, from: txn.date) == currentMonth &&
+                              calendar.component(.year, from: txn.date) == currentYear
+            let isTransferToSavings = txn.type == .transfer && txn.toAccount?.type == .savings
+            // Exclude internal transfers from another savings account
+            let notFromSavings = txn.account?.type != .savings
+            
+            return isThisMonth && isTransferToSavings && notFromSavings
+        }.reduce(0) { $0 + $1.amount }
+    }
+    
+    // NEW: Calculate transfers to Investments this month
+    private var investedThisMonth: Double {
+        let calendar = Calendar.current
+        let currentMonth = calendar.component(.month, from: Date())
+        let currentYear = calendar.component(.year, from: Date())
+        
+        return transactions.filter { txn in
+            let isThisMonth = calendar.component(.month, from: txn.date) == currentMonth &&
+                              calendar.component(.year, from: txn.date) == currentYear
+            let isTransferToInvestment = txn.type == .transfer && txn.toAccount?.type == .investment
+            // Exclude internal transfers from another investment account
+            let notFromInvestment = txn.account?.type != .investment
+            
+            return isThisMonth && isTransferToInvestment && notFromInvestment
+        }.reduce(0) { $0 + $1.amount }
+    }
+    
+    // NEW: Usable Net Income (Income - Expenses - Saved - Invested)
+    private var usableNetIncomeThisMonth: Double {
+        return viewModel.incomeThisMonth - viewModel.expensesThisMonth - savedThisMonth - investedThisMonth
     }
     
     // MARK: - UI Components
     
-    // The Cash Flow monthly performance visualizer
+    private var weeklyPulseCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Weekly Pulse")
+                        .font(.headline)
+                    Text("Resets every Monday")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                
+                Spacer()
+                
+                Button {
+                    newWeeklyLimitString = String(format: "%.0f", weeklyLimit)
+                    isEditingWeeklyLimit = true
+                } label: {
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.title3)
+                        .foregroundStyle(.blue)
+                        .padding(8)
+                        .background(Color.blue.opacity(0.1))
+                        .clipShape(Circle())
+                }
+            }
+            
+            let progress = min(spentThisWeek / weeklyLimit, 1.0)
+            let remaining = max(weeklyLimit - spentThisWeek, 0)
+            let isOverBudget = spentThisWeek > weeklyLimit
+            
+            HStack(alignment: .bottom) {
+                MoneyText(amount: spentThisWeek)
+                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                    .foregroundStyle(isOverBudget ? .red : .primary)
+                
+                Text("/ \(weeklyLimit.formatted(.currency(code: selectedCurrencyCode)))")
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
+                    .padding(.bottom, 5)
+                
+                Spacer()
+                
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("Remaining")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    MoneyText(amount: remaining)
+                        .font(.headline)
+                        .foregroundStyle(remaining > 0 ? .green : .red)
+                }
+            }
+            
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(Color.gray.opacity(0.2))
+                    
+                    Capsule()
+                        .fill(isOverBudget ? Color.red : Color.blue)
+                        .frame(width: max(0, geo.size.width * CGFloat(progress)))
+                }
+            }
+            .frame(height: 10)
+        }
+        .padding(20)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
+    }
+    
+    // UPDATED: 3-Tier Cash Flow Card
     private var cashFlowCard: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("This Month's Cash Flow")
                 .font(.headline)
             
+            // Tier 1: Income vs Expenses
             HStack {
-                // Income Indicator Column
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
                         Circle().fill(.green).frame(width: 8, height: 8)
@@ -113,7 +249,6 @@ struct DashboardView: View {
                 
                 Spacer()
                 
-                // Expense Indicator Column
                 VStack(alignment: .trailing, spacing: 4) {
                     HStack {
                         Text("Expenses")
@@ -129,17 +264,44 @@ struct DashboardView: View {
             
             Divider()
             
-            // Final Delta Summary Section
+            // Tier 2: Saved vs Invested
             HStack {
-                Text("Net Income")
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Saved")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    MoneyText(amount: savedThisMonth)
+                        .font(.subheadline)
+                        .bold()
+                        .foregroundStyle(.blue)
+                }
+                
+                Spacer()
+                
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text("Invested")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    MoneyText(amount: investedThisMonth)
+                        .font(.subheadline)
+                        .bold()
+                        .foregroundStyle(.purple)
+                }
+            }
+            
+            Divider()
+            
+            // Tier 3: Usable Net Income
+            HStack {
+                Text("Usable Net Income")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 
                 Spacer()
                 
-                MoneyText(amount: viewModel.netCashFlowThisMonth)
+                MoneyText(amount: usableNetIncomeThisMonth)
                     .font(.headline)
-                    .foregroundStyle(viewModel.netCashFlowThisMonth >= 0 ? .green : .red)
+                    .foregroundStyle(usableNetIncomeThisMonth >= 0 ? .green : .red)
             }
         }
         .padding(20)
@@ -148,16 +310,12 @@ struct DashboardView: View {
         .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
     }
     
-    // The Budget Grid Section
     private var budgetsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            
-            // Section Header
             HStack {
                 Text("This Month’s Budget")
                     .font(.headline)
                 
-                // Add Card Button
                 Button {
                     addNewBudgetCard()
                 } label: {
@@ -168,7 +326,6 @@ struct DashboardView: View {
                 
                 Spacer()
                 
-                // Done Button (Only shows when wiggling)
                 if isEditingBudgets {
                     Button("Done") {
                         withAnimation { isEditingBudgets = false }
@@ -184,10 +341,8 @@ struct DashboardView: View {
                     .foregroundStyle(.secondary)
                     .padding(.vertical, 8)
             } else {
-                // The 2-Column Grid
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                     ForEach(Array(pinnedCategoryIDs.enumerated()), id: \.offset) { index, categoryID in
-                        
                         DashboardBudgetCard(
                             categoryID: categoryID,
                             categories: categories,
@@ -197,7 +352,6 @@ struct DashboardView: View {
                             onRemove: { removeBudgetCard(at: index) },
                             onChangeCategory: { newCategory in updateBudgetCard(at: index, with: newCategory.id) }
                         )
-                        // Long press to enter wiggle mode!
                         .onLongPressGesture {
                             withAnimation { isEditingBudgets = true }
                         }
@@ -207,7 +361,6 @@ struct DashboardView: View {
         }
     }
     
-    // The sideways scrollable section for our current month insights
     private var scrollableChartsSection: some View {
         TabView {
             ChartCard(title: "Daily Spending (This Month)") {
@@ -401,27 +554,20 @@ struct DashboardView: View {
     
     private func addNewBudgetCard() {
         var currentIDs = pinnedCategoryIDs
-        // Default to the first available category, or an empty UUID if none exist
         let newID = categories.first?.id ?? UUID()
         currentIDs.append(newID)
-        
-        // Save directly to the @AppStorage string!
         pinnedBudgetCardsString = currentIDs.map { $0.uuidString }.joined(separator: ",")
     }
 
     private func removeBudgetCard(at index: Int) {
         var currentIDs = pinnedCategoryIDs
         currentIDs.remove(at: index)
-        
-        // Save directly to the @AppStorage string!
         pinnedBudgetCardsString = currentIDs.map { $0.uuidString }.joined(separator: ",")
     }
 
     private func updateBudgetCard(at index: Int, with newID: UUID) {
         var currentIDs = pinnedCategoryIDs
         currentIDs[index] = newID
-        
-        // Save directly to the @AppStorage string!
         pinnedBudgetCardsString = currentIDs.map { $0.uuidString }.joined(separator: ",")
     }
 }
@@ -437,22 +583,18 @@ struct DashboardBudgetCard: View {
     let onRemove: () -> Void
     let onChangeCategory: (Category) -> Void
     
-    // Animation state for the wiggle
     @State private var wigglePhase: CGFloat = 0
 
-    // 1. Find the actual Category object from the UUID
     private var currentCategory: Category? {
         categories.first(where: { $0.id == categoryID })
     }
     
-    // 2. Find the planned amount for THIS month
     private var plannedAmount: Double {
         let currentMonth = Calendar.current.component(.month, from: Date())
         let currentYear = Calendar.current.component(.year, from: Date())
         return budgets.first(where: { $0.category?.id == categoryID && $0.month == currentMonth && $0.year == currentYear })?.plannedAmount ?? 0.0
     }
     
-    // 3. Find the spent amount for THIS month
     private var spentAmount: Double {
         let currentMonth = Calendar.current.component(.month, from: Date())
         let currentYear = Calendar.current.component(.year, from: Date())
@@ -485,10 +627,8 @@ struct DashboardBudgetCard: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             
-            // Main Card Background
             VStack(alignment: .leading, spacing: 12) {
                 
-                // Dropdown Menu to change category
                 Menu {
                     ForEach(categories) { category in
                         Button(category.name) {
@@ -508,7 +648,6 @@ struct DashboardBudgetCard: View {
                     }
                 }
                 
-                // Amounts Row
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Spent")
@@ -531,7 +670,6 @@ struct DashboardBudgetCard: View {
                     }
                 }
                 
-                // Progress Bar
                 VStack(alignment: .leading, spacing: 6) {
                     GeometryReader { geo in
                         ZStack(alignment: .leading) {
@@ -555,7 +693,6 @@ struct DashboardBudgetCard: View {
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
             
-            // Delete Overlay (Only visible in Edit Mode)
             if isEditing {
                 Button {
                     onRemove()
@@ -565,10 +702,9 @@ struct DashboardBudgetCard: View {
                         .foregroundStyle(.white, .red)
                         .background(Circle().fill(Color.white))
                 }
-                .offset(x: -8, y: -8) // Pulls the button slightly outside the top-left corner
+                .offset(x: -8, y: -8)
             }
         }
-        // The Wiggle Animation!
         .rotationEffect(.degrees(isEditing ? wigglePhase : 0))
         .onChange(of: isEditing) { _, editing in
             if editing {
@@ -580,7 +716,6 @@ struct DashboardBudgetCard: View {
             }
         }
         .onAppear {
-            // Give it a slightly randomized start if it appears while already editing
             if isEditing { wigglePhase = -1.5 }
         }
     }

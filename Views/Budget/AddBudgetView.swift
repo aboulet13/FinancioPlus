@@ -21,22 +21,39 @@ struct AddBudgetView: View {
     
     @State private var selectedCategory: Category?
     @State private var plannedAmount = 0.0
-    @State private var isRecurring = false // NEW: Form state
+    @State private var isRecurring = false
+    
+    @State private var isShowingAddCategory = false
     
     var body: some View {
         NavigationStack {
             Form {
                 Section("Budget Details") {
-                    Picker("Category", selection: $selectedCategory) {
-                        Text("Select a category").tag(Category?.none)
-                        ForEach(expenseCategories) { category in
-                            Text(category.name).tag(Optional(category))
+                    
+                    // NEW: We wrap the Picker and the Button in an HStack to place them on the same row.
+                    HStack {
+                        Picker("Category", selection: $selectedCategory) {
+                            Text("Select a category").tag(Category?.none)
+                            
+                            ForEach(expenseCategories) { category in
+                                Text(category.name).tag(Optional(category))
+                            }
                         }
+                        
+                        // The small "+" button to add a new category inline
+                        Button {
+                            isShowingAddCategory = true
+                        } label: {
+                            Image(systemName: "plus")
+                                .font(.body.bold())
+                        }
+                        // CRITICAL: We use .plain so that tapping the Picker doesn't trigger this button
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.blue)
                     }
                     
                     SmartDecimalField("Planned Amount", value: $plannedAmount)
                     
-                    // NEW: The Toggle
                     Toggle("Repeat Monthly", isOn: $isRecurring)
                 }
                 
@@ -59,17 +76,36 @@ struct AddBudgetView: View {
                         .disabled(!isFormValid)
                 }
             }
+            .sheet(isPresented: $isShowingAddCategory) {
+                AddCategoryView(onSave: { newCategory in
+                    // Instantly select the newly created category!
+                    self.selectedCategory = newCategory
+                })
+            }
         }
     }
     
-    private var expenseCategories: [Category] { categories.filter { $0.kind == CategoryKind.expense } }
+    // MARK: - Logic & Helpers
+    
+    private var expenseCategories: [Category] {
+        categories.filter { $0.kind == CategoryKind.expense }
+    }
     
     private var duplicateBudgetExists: Bool {
         guard let selectedCategory else { return false }
-        return budgets.contains { $0.month == month && $0.year == year && $0.category?.id == selectedCategory.id }
+        
+        return budgets.contains { budget in
+            budget.month == month &&
+            budget.year == year &&
+            budget.category?.id == selectedCategory.id
+        }
     }
     
-    private var isFormValid: Bool { selectedCategory != nil && plannedAmount > 0 && !duplicateBudgetExists }
+    private var isFormValid: Bool {
+        selectedCategory != nil &&
+        plannedAmount > 0 &&
+        !duplicateBudgetExists
+    }
     
     private func saveBudget() {
         guard let selectedCategory else { return }
@@ -79,7 +115,7 @@ struct AddBudgetView: View {
             year: year,
             plannedAmount: plannedAmount,
             category: selectedCategory,
-            isRecurring: isRecurring // NEW: Save it!
+            isRecurring: isRecurring
         )
         
         modelContext.insert(newBudget)
